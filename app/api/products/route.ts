@@ -1,0 +1,44 @@
+import { NextRequest } from "next/server";
+
+import { connectToDatabase } from "@/lib/mongodb";
+import { errorResponse, serialize, successResponse } from "@/lib/http";
+import { Product } from "@/lib/models";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
+  await connectToDatabase();
+
+  const { searchParams } = new URL(request.url);
+  const q = searchParams.get("q")?.trim();
+  const categoryId = searchParams.get("categoryId");
+  const collectionId = searchParams.get("collectionId");
+  const status = searchParams.get("status");
+  const limit = Number(searchParams.get("limit") ?? 20);
+
+  const query: Record<string, unknown> = {};
+  if (q) {
+    query.$or = [
+      { name: new RegExp(q, "i") },
+      { shortDescription: new RegExp(q, "i") },
+      { tags: new RegExp(q, "i") },
+    ];
+  }
+  if (categoryId) query.categoryId = categoryId;
+  if (collectionId) query.collectionId = collectionId;
+  if (status) query.status = status;
+
+  const products = await Product.find(query).sort({ createdAt: -1 }).limit(limit);
+  return successResponse(serialize(products));
+}
+
+export async function POST(request: NextRequest) {
+  await connectToDatabase();
+  const payload = await request.json().catch(() => null);
+  if (!payload) {
+    return errorResponse("Invalid JSON body.", 400);
+  }
+
+  const created = await Product.create(payload);
+  return successResponse(serialize(created), 201);
+}

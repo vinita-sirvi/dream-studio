@@ -18,7 +18,9 @@ type IconName =
   | "gift"
   | "shield"
   | "tag"
-  | "heart";
+  | "heart"
+  | "menu"
+  | "close";
 
 const stroke = "currentColor";
 
@@ -181,6 +183,18 @@ export function Icon({
       return (
         <svg viewBox="0 0 24 24" className={className} {...common}>
           <path d="M12 20.5 4.2 12.7a4.2 4.2 0 0 1 5.9-5.9L12 8.7l1.9-1.9a4.2 4.2 0 0 1 5.9 5.9z" />
+        </svg>
+      );
+    case "menu":
+      return (
+        <svg viewBox="0 0 24 24" className={className} {...common}>
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      );
+    case "close":
+      return (
+        <svg viewBox="0 0 24 24" className={className} {...common}>
+          <path d="m6 6 12 12M18 6 6 18" />
         </svg>
       );
   }
