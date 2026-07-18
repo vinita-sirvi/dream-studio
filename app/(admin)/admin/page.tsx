@@ -35,15 +35,19 @@ export default async function AdminDashboardPage() {
           <Link href="/admin/orders" className="rounded-md border border-white/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             Orders
           </Link>
+          <Link href="/admin/custom-orders" className="rounded-md border border-white/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
+            Custom Orders
+          </Link>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         {[
           { label: "Products", value: summary.productCount },
           { label: "Categories", value: summary.categoryCount },
           { label: "Collections", value: summary.collectionCount },
           { label: "Orders", value: summary.orderCount },
+          { label: "Custom Orders", value: summary.customOrderCount ?? 0 },
         ].map((item) => (
           <div key={item.label} className="rounded-[1.5rem] border border-[#eadccc] bg-white/85 p-6 shadow-[0_16px_34px_rgba(103,73,47,0.08)]">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8a6b56]">
@@ -93,6 +97,28 @@ export default async function AdminDashboardPage() {
               </div>
             )) : (
               <p className="text-sm text-[#6f5d50]">No recent orders yet.</p>
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-[1.8rem] border border-[#eadccc] bg-white/85 p-6 shadow-[0_16px_34px_rgba(103,73,47,0.08)]">
+          <h2
+            className="text-2xl font-medium text-[#2f2319]"
+            style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
+          >
+            Recent custom orders
+          </h2>
+          <div className="mt-5 space-y-3">
+            {summary.recentCustomOrders?.length ? summary.recentCustomOrders.map((order) => (
+              <div key={order.orderId} className="flex items-center justify-between rounded-2xl border border-[#eadccc] bg-[#fbf6ef] px-4 py-3">
+                <div>
+                  <p className="font-medium text-[#2f2319]">{order.name}</p>
+                  <p className="text-sm text-[#6f5d50]">{order.productType}</p>
+                </div>
+                <p className="text-sm font-semibold text-[#2f2319]">{order.stage}</p>
+              </div>
+            )) : (
+              <p className="text-sm text-[#6f5d50]">No custom orders yet.</p>
             )}
           </div>
         </div>

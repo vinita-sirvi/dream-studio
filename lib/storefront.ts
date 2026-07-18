@@ -2,11 +2,10 @@ import { cache } from "react";
 
 import { serialize } from "./http";
 import {
-  connectToDatabase,
   isDatabaseConfigured,
   tryConnectToDatabase,
 } from "./mongodb";
-import { Category, Collection, Order, Product } from "./models";
+import { Category, Collection, CustomOrder, Order, Product } from "./models";
 import { ensureSeedData } from "./seed";
 import { demoCategories, demoCollections, demoProducts } from "./demo-data";
 
@@ -233,7 +232,9 @@ export const getAdminSummary = cache(async () => {
       categoryCount: demoCategories.length,
       collectionCount: demoCollections.length,
       orderCount: 2,
+      customOrderCount: 0,
       recentOrders: [],
+      recentCustomOrders: [],
       recentProducts: fallbackShopData({}).products.slice(0, 5),
     };
   }
@@ -245,20 +246,33 @@ export const getAdminSummary = cache(async () => {
       categoryCount: demoCategories.length,
       collectionCount: demoCollections.length,
       orderCount: 2,
+      customOrderCount: 0,
       recentOrders: [],
+      recentCustomOrders: [],
       recentProducts: fallbackShopData({}).products.slice(0, 5),
     };
   }
 
   await ensureSeedData();
 
-  const [productCount, categoryCount, collectionCount, orderCount, recentOrders, recentProducts] =
+  const [
+    productCount,
+    categoryCount,
+    collectionCount,
+    orderCount,
+    customOrderCount,
+    recentOrders,
+    recentCustomOrders,
+    recentProducts,
+  ] =
     await Promise.all([
       Product.countDocuments({}),
       Category.countDocuments({}),
       Collection.countDocuments({}),
       Order.countDocuments({}),
+      CustomOrder.countDocuments({}),
       Order.find({}).sort({ createdAt: -1 }).limit(5).lean(),
+      CustomOrder.find({}).sort({ createdAt: -1 }).limit(5).lean(),
       Product.find({}).sort({ createdAt: -1 }).limit(5).lean(),
     ]);
 
@@ -267,7 +281,9 @@ export const getAdminSummary = cache(async () => {
     categoryCount,
     collectionCount,
     orderCount,
+    customOrderCount,
     recentOrders: serialize(recentOrders),
+    recentCustomOrders: serialize(recentCustomOrders),
     recentProducts: (recentProducts as any[]).map((item, index) => normalizeProduct(item, index)),
   };
 });

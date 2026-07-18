@@ -31,6 +31,7 @@ export const adminLinks = [
   { label: "Categories", href: "/admin/categories" },
   { label: "Collections", href: "/admin/collections" },
   { label: "Orders", href: "/admin/orders" },
+  { label: "Custom Orders", href: "/admin/custom-orders" },
   { label: "Customers", href: "/admin/customers" },
   { label: "Settings", href: "/admin/settings" },
 ] as const;
