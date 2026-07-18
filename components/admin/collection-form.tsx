@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CloudinaryUploadField } from "@/components/admin/cloudinary-upload-field";
+
 export function CollectionForm({
   mode,
   collectionId,
@@ -85,7 +87,14 @@ export function CollectionForm({
         <input className={inputClass} placeholder="Slug" value={form.slug} onChange={(e) => updateField("slug", e.target.value)} required />
       </div>
       <textarea className={inputClass} placeholder="Description" rows={5} value={form.description} onChange={(e) => updateField("description", e.target.value)} />
-      <input className={inputClass} placeholder="Hero image URL" value={form.heroImage} onChange={(e) => updateField("heroImage", e.target.value)} />
+      <CloudinaryUploadField
+        label="Hero image"
+        value={form.heroImage}
+        onChange={(next) => updateField("heroImage", next)}
+        folder="collections"
+        accept="image/*"
+        helperText="Upload a collection hero image to Cloudinary."
+      />
       <div className="grid gap-4 md:grid-cols-2">
         <select className={inputClass} value={form.status} onChange={(e) => updateField("status", e.target.value)}>
           <option value="draft">Draft</option>

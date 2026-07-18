@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CloudinaryUploadField } from "@/components/admin/cloudinary-upload-field";
+
 export function CategoryForm({
   mode,
   categoryId,
@@ -95,7 +97,15 @@ export function CategoryForm({
             <option key={option.id} value={option.id}>{option.name}</option>
           ))}
         </select>
-        <input className={inputClass} placeholder="Image URL" value={form.image} onChange={(e) => updateField("image", e.target.value)} />
+        <CloudinaryUploadField
+          label="Category image"
+          value={form.image}
+          onChange={(next) => updateField("image", next)}
+          folder="categories"
+          accept="image/*"
+          helperText="Upload a category cover image to Cloudinary."
+          compact
+        />
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <input className={inputClass} type="number" min={0} placeholder="Sort order" value={form.sortOrder} onChange={(e) => updateField("sortOrder", e.target.value)} />

@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { CloudinaryUploadField } from "@/components/admin/cloudinary-upload-field";
+
 type Option = {
   id: string;
   name: string;
@@ -83,73 +85,77 @@ function ImageEditor({
       {value.map((item, index) => (
         <div
           key={`${item.url || "image"}-${index}`}
-          className="grid gap-3 rounded-2xl border border-[#eadccc] bg-[#fcf8f2] p-4 md:grid-cols-[1.4fr_1fr_130px_110px_96px_auto]"
+          className="grid gap-4 rounded-2xl border border-[#eadccc] bg-[#fcf8f2] p-4"
         >
-          <input
+          <CloudinaryUploadField
+            label={`Product media ${index + 1}`}
             value={item.url}
-            onChange={(event) => {
-              const next = [...value];
-              next[index] = { ...next[index], url: event.target.value };
-              onChange(next);
+            onChange={(next) => {
+              const nextValue = [...value];
+              nextValue[index] = { ...nextValue[index], url: next };
+              onChange(nextValue);
             }}
-            placeholder="Image URL"
-            className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+            folder="products"
+            accept="image/*,video/*"
+            helperText="Drop product imagery here. Cloudinary stores the asset and we save the URL."
           />
-          <input
-            value={item.alt}
-            onChange={(event) => {
-              const next = [...value];
-              next[index] = { ...next[index], alt: event.target.value };
-              onChange(next);
-            }}
-            placeholder="Alt text"
-            className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
-          />
-          <select
-            value={item.type}
-            onChange={(event) => {
-              const next = [...value];
-              next[index] = { ...next[index], type: event.target.value as ImageItem["type"] };
-              onChange(next);
-            }}
-            className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
-          >
-            <option value="image">Image</option>
-            <option value="video">Video</option>
-          </select>
-          <input
-            value={item.sortOrder}
-            onChange={(event) => {
-              const next = [...value];
-              next[index] = { ...next[index], sortOrder: event.target.value };
-              onChange(next);
-            }}
-            type="number"
-            min={0}
-            placeholder="Order"
-            className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
-          />
-          <label className="flex items-center gap-2 rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm text-[#49382d]">
+          <div className="grid gap-3 md:grid-cols-[1fr_140px_120px_110px_auto]">
             <input
-              type="checkbox"
-              checked={item.isPrimary}
+              value={item.alt}
               onChange={(event) => {
-                const next = value.map((row, rowIndex) => ({
-                  ...row,
-                  isPrimary: rowIndex === index ? event.target.checked : false,
-                }));
+                const next = [...value];
+                next[index] = { ...next[index], alt: event.target.value };
                 onChange(next);
               }}
+              placeholder="Alt text"
+              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
             />
-            Primary
-          </label>
-          <button
-            type="button"
-            onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
-            className="rounded-md border border-[#d8c5b0] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
-          >
-            Remove
-          </button>
+            <select
+              value={item.type}
+              onChange={(event) => {
+                const next = [...value];
+                next[index] = { ...next[index], type: event.target.value as ImageItem["type"] };
+                onChange(next);
+              }}
+              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+            >
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+            <input
+              value={item.sortOrder}
+              onChange={(event) => {
+                const next = [...value];
+                next[index] = { ...next[index], sortOrder: event.target.value };
+                onChange(next);
+              }}
+              type="number"
+              min={0}
+              placeholder="Order"
+              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+            />
+            <label className="flex items-center gap-2 rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm text-[#49382d]">
+              <input
+                type="checkbox"
+                checked={item.isPrimary}
+                onChange={(event) => {
+                  const next = value.map((row, rowIndex) => ({
+                    ...row,
+                    isPrimary: rowIndex === index ? event.target.checked : false,
+                  }));
+                  onChange(next);
+                }}
+              />
+              Primary
+            </label>
+            <button
+              type="button"
+              onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
+              className="rounded-md border border-[#d8c5b0] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       ))}
       <button

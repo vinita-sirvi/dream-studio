@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { CloudinaryUploadField } from "@/components/admin/cloudinary-upload-field";
+
 const initialState = {
   name: "",
   email: "",
@@ -164,11 +166,13 @@ export function CustomOrderForm() {
         placeholder="Measurements, e.g. bust: 36, waist: 30, hip: 40"
         className={inputClass}
       />
-      <input
+      <CloudinaryUploadField
+        label="Inspiration image"
         value={form.inspirationImage}
-        onChange={(event) => updateField("inspirationImage", event.target.value)}
-        placeholder="Inspiration image URL"
-        className={inputClass}
+        onChange={(next) => updateField("inspirationImage", next)}
+        folder="custom-orders"
+        accept="image/*"
+        helperText="Upload an inspiration image or mood board reference."
       />
       <textarea
         value={form.specialInstructions}

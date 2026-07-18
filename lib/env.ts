@@ -13,6 +13,11 @@ const envSchema = z.object({
   APP_URL: optionalString,
   SESSION_SECRET: optionalString,
   ADMIN_EMAILS: z.string().optional(),
+  CLOUDINARY_CLOUD_NAME: optionalString,
+  CLOUDINARY_API_KEY: optionalString,
+  CLOUDINARY_API_SECRET: optionalString,
+  NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: optionalString,
+  NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: optionalString,
 });
 
 export const env = envSchema.parse(process.env);
