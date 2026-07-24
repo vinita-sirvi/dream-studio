@@ -2,34 +2,13 @@ import Link from "next/link";
 
 import { Icon } from "./icons";
 
-const toneClasses = {
-  rose: "from-[#efd0d8] to-[#d79aa8]",
-  gold: "from-[#f1d9aa] to-[#d8a647]",
-  ivory: "from-[#f7f1e8] to-[#e8d8c3]",
-  slate: "from-[#d7e0ea] to-[#93adc5]",
-  wine: "from-[#e9c7c8] to-[#9a4b55]",
-  plum: "from-[#ebd8ef] to-[#a274b5]",
-  olive: "from-[#dbe7c8] to-[#88a14f]",
-  blush: "from-[#f3d8da] to-[#d18b99]",
-} as const;
-
-function ProductVisual({ tone }: { tone: keyof typeof toneClasses }) {
-  return (
-    <div className={`relative h-full w-full overflow-hidden bg-gradient-to-br ${toneClasses[tone]}`}>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.7),transparent_26%),radial-gradient(circle_at_20%_70%,rgba(255,255,255,0.26),transparent_22%)]" />
-      <div className="absolute left-[12%] top-[14%] h-24 w-24 rounded-full bg-white/30 blur-3xl" />
-      <div className="absolute left-1/2 top-[12%] h-[16%] w-[20%] -translate-x-1/2 rounded-[48%] bg-[#e5b8a0] shadow-[0_12px_20px_rgba(88,50,31,0.1)]" />
-      <div className="absolute left-1/2 top-[20%] h-[28%] w-[34%] -translate-x-1/2 rounded-[42%_42%_18%_18%] bg-[rgba(255,255,255,0.18)]" />
-      <div className="absolute left-1/2 top-[24%] h-[42%] w-[38%] -translate-x-1/2 rounded-[40%_40%_18%_18%/22%_22%_10%_10%] bg-[rgba(255,255,255,0.28)]" />
-      <div className="absolute bottom-6 left-1/2 h-2.5 w-24 -translate-x-1/2 rounded-full bg-black/10 blur-sm" />
-    </div>
-  );
+function getProductImage(images: ProductCardProps["product"]["images"]) {
+  return [...(images ?? [])]
+    .filter((image) => image.type !== "video" && image.url?.trim())
+    .sort((a, b) => Number(Boolean(b.isPrimary)) - Number(Boolean(a.isPrimary)) || (a.sortOrder ?? 0) - (b.sortOrder ?? 0))[0];
 }
 
-export function ProductCard({
-  product,
-  href,
-}: {
+type ProductCardProps = {
   product: {
     name: string;
     slug: string;
@@ -38,16 +17,27 @@ export function ProductCard({
     mrp?: number;
     discountPercent?: number;
     category?: string;
-    collection?: string;
-    tone: keyof typeof toneClasses;
     stock?: number;
+    images?: Array<{ url: string; alt?: string; type?: string; isPrimary?: boolean; sortOrder?: number }>;
   };
   href?: string;
-}) {
+};
+
+export function ProductCard({
+  product,
+  href,
+}: ProductCardProps) {
+  const image = getProductImage(product.images);
   const card = (
     <article className="group overflow-hidden rounded-[1.4rem] border border-[#eadccc] bg-white shadow-[0_16px_34px_rgba(94,67,43,0.07)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_42px_rgba(94,67,43,0.12)]">
       <div className="relative aspect-[4/5]">
-        <ProductVisual tone={product.tone} />
+        {image ? (
+          <img src={image.url} alt={image.alt || product.name} className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full place-items-center bg-[#f8f1e8] px-6 text-center text-xs uppercase tracking-[0.14em] text-[#8a7768]">
+            Image coming soon
+          </div>
+        )}
         {product.discountPercent ? (
           <span className="absolute left-3 top-3 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#2f2319]">
             {product.discountPercent}% off

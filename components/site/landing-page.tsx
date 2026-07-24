@@ -1,5 +1,4 @@
 import {
-  arrivals,
   categories,
   features,
   processSteps,
@@ -7,6 +6,7 @@ import {
 } from "@/data/home";
 
 import { Icon } from "./icons";
+import { ProductCard } from "./product-card";
 
 const toneMap = {
   rose: {
@@ -224,42 +224,6 @@ function ProcessStep({
   );
 }
 
-function ArrivalCard({
-  name,
-  price,
-  tone,
-}: {
-  name: string;
-  price: string;
-  tone: keyof typeof toneMap;
-}) {
-  return (
-    <article className="group">
-      <div className="relative overflow-hidden rounded-[1.1rem] border border-[#eadccc] bg-white shadow-[0_16px_32px_rgba(92,65,43,0.07)] transition group-hover:-translate-y-1">
-        <div className="absolute left-3 top-3 z-10 rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#2f2319]">
-          New
-        </div>
-        <button
-          type="button"
-          className="absolute right-3 top-3 z-10 text-white/80 transition hover:text-[#c69b8d]"
-          aria-label="Add to wishlist"
-        >
-          <Icon name="heart" className="h-5 w-5" />
-        </button>
-        <div className="aspect-[4/5]">
-          <VisualArt tone={tone} variant="arrival" />
-        </div>
-      </div>
-      <h3 className="mt-3 text-center text-sm font-medium leading-6 text-[#2f2319]">
-        {name}
-      </h3>
-      <p className="mt-1 text-center text-sm font-semibold text-[#2f2319]">
-        {price}
-      </p>
-    </article>
-  );
-}
-
 function TrustItem({
   title,
   text,
@@ -284,7 +248,16 @@ function TrustItem({
   );
 }
 
-export function LandingPage() {
+export function LandingPage({ products }: { products: Array<{
+  name: string;
+  slug: string;
+  shortDescription?: string;
+  price: number;
+  mrp?: number;
+  discountPercent?: number;
+  category?: string;
+  images?: Array<{ url: string; alt?: string; type?: string; isPrimary?: boolean; sortOrder?: number }>;
+}> }) {
   return (
     <main id="home" className="flex-1">
       <section className="mx-auto w-full max-w-[1440px] px-3 pb-4 pt-3 md:px-6 lg:px-8">
@@ -407,11 +380,16 @@ export function LandingPage() {
 
       <section className="mx-auto w-full max-w-[1440px] px-3 py-16 md:px-6 lg:px-8">
         <SectionTitle title="New Arrivals" />
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          {arrivals.map((item) => (
-            <ArrivalCard key={item.name} {...item} />
+        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.slug} product={product} href={`/products/${product.slug}`} />
           ))}
         </div>
+        {!products.length ? (
+          <p className="mt-8 text-center text-sm text-[#6e5d50]">
+            New products will appear here after they are published with an uploaded image.
+          </p>
+        ) : null}
       </section>
 
       <section className="mx-auto w-full max-w-[1440px] px-3 md:px-6 lg:px-8">

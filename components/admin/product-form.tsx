@@ -295,7 +295,7 @@ export function ProductForm({
     pattern: initialValues?.pattern ?? "",
     material: initialValues?.material ?? "",
     fit: initialValues?.fit ?? "",
-    status: initialValues?.status ?? "draft",
+    status: initialValues?.status ?? (mode === "create" ? "active" : "draft"),
     visibility: initialValues?.visibility ?? "public",
     mrp: String(initialValues?.mrp ?? 0),
     sellingPrice: String(initialValues?.sellingPrice ?? 0),

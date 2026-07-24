@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 import { connectToDatabase } from "@/lib/mongodb";
-import { errorResponse, serialize, successResponse } from "@/lib/http";
+import { errorResponse, successResponse } from "@/lib/http";
 import { User } from "@/lib/models";
 import { authRegisterSchema } from "@/lib/validators";
 import { hashPassword } from "@/lib/password";
@@ -43,5 +43,10 @@ export async function POST(request: NextRequest) {
     }),
   );
 
-  return successResponse(serialize(user), 201);
+  return successResponse({
+    id: String(user._id),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+  }, 201);
 }

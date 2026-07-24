@@ -116,12 +116,12 @@ function fallbackShopData(filters: ShopFilters = {}) {
 
 export const getShopData = cache(async (filters: ShopFilters = {}) => {
   if (!isDatabaseConfigured()) {
-    return fallbackShopData(filters);
+    return { categories: [], collections: [], products: [], featuredProducts: [] };
   }
 
   const connected = await tryConnectToDatabase();
   if (!connected) {
-    return fallbackShopData(filters);
+    return { categories: [], collections: [], products: [], featuredProducts: [] };
   }
 
   await ensureSeedData();
@@ -132,6 +132,7 @@ export const getShopData = cache(async (filters: ShopFilters = {}) => {
     Product.find({
       status: "active",
       visibility: "public",
+      images: { $elemMatch: { type: "image", url: { $exists: true, $ne: "" } } },
     })
       .populate("categoryId collectionId")
       .sort({ createdAt: -1 })

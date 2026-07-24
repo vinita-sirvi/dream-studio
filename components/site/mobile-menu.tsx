@@ -8,7 +8,7 @@ import { mainNav } from "@/data/navigation";
 
 import { Icon } from "./icons";
 
-export function MobileMenu() {
+export function MobileMenu({ user }: { user: { name: string } | null }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -66,12 +66,21 @@ export function MobileMenu() {
             </nav>
 
             <div className="mt-8 grid gap-3">
-              <Link
-                href="/login"
-                className="rounded-md bg-[#3b2417] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white"
-              >
-                Sign In
-              </Link>
+              {user ? (
+                <Link
+                  href="/account"
+                  className="rounded-md bg-[#3b2417] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white"
+                >
+                  {user.name}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="rounded-md bg-[#3b2417] px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.14em] text-white"
+                >
+                  Sign In
+                </Link>
+              )}
               <Link
                 href="/custom-order"
                 className="rounded-md border border-[#d8c5b0] bg-white px-5 py-3 text-center text-sm font-semibold uppercase tracking-[0.14em] text-[#3b2417]"

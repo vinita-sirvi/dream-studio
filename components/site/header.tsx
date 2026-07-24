@@ -5,8 +5,11 @@ import { mainNav } from "@/data/navigation";
 
 import { Icon } from "./icons";
 import { MobileMenu } from "./mobile-menu";
+import { HeaderAccount } from "./header-account";
+import { getCurrentSession } from "@/lib/session";
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const session = await getCurrentSession();
   return (
     <header className="sticky top-0 z-40 w-full">
       <div className="bg-[#2a1b10] px-4 py-2 text-center text-[11px] font-medium uppercase tracking-[0.24em] text-[#f6eadf] md:text-xs">
@@ -15,7 +18,7 @@ export function SiteHeader() {
 
       <div className="border-b border-[#eadccc] bg-[#fbf4eb]/95 backdrop-blur">
         <div className="mx-auto flex max-w-[1440px] items-center gap-3 px-4 py-4 md:gap-4 md:px-8 lg:px-10">
-          <MobileMenu />
+          <MobileMenu user={session?.user ?? null} />
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-3">
             <div className="grid h-11 w-11 place-items-center rounded-full border border-[#ccb399] text-[#8d6236] md:h-14 md:w-14">
               <span className="text-2xl font-semibold leading-none md:text-3xl">DD</span>
@@ -62,13 +65,7 @@ export function SiteHeader() {
             >
               <Icon name="search" className="h-5 w-5" />
             </button>
-            <button
-              type="button"
-              className="grid h-9 w-9 place-items-center rounded-full border border-transparent transition hover:border-[#d9c6b3] hover:bg-white/70 md:h-10 md:w-10"
-              aria-label="Account"
-            >
-              <Icon name="user" className="h-5 w-5" />
-            </button>
+            <HeaderAccount user={session?.user ?? null} />
             <button
               type="button"
               className="relative grid h-9 w-9 place-items-center rounded-full border border-transparent transition hover:border-[#d9c6b3] hover:bg-white/70 md:h-10 md:w-10"

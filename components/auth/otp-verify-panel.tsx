@@ -7,7 +7,8 @@ export function OtpVerifyPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const defaultEmail = searchParams.get("email") ?? "";
-  const nextPath = searchParams.get("next") ?? "/account";
+  const requestedNext = searchParams.get("next");
+  const nextPath = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/account";
   const [email, setEmail] = useState(defaultEmail);
   const [code, setCode] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");

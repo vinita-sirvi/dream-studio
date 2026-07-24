@@ -1,10 +1,15 @@
 import { customerLinks } from "@/data/navigation";
+import { getCurrentSession } from "@/lib/session";
+import { redirect } from "next/navigation";
 
-export default function CustomerLayout({
+export default async function CustomerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getCurrentSession();
+  if (!session) redirect("/login?next=/account");
+
   return (
     <div className="mx-auto grid min-h-[72vh] w-full max-w-[1440px] gap-6 px-4 py-10 md:grid-cols-[280px_1fr] md:px-8">
       <aside className="rounded-[2rem] border border-[#eadccc] bg-white/80 p-6 shadow-[0_16px_36px_rgba(103,73,47,0.06)]">

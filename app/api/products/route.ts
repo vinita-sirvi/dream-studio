@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Product } from "@/lib/models";
+import { getCurrentSession, isAdminRole } from "@/lib/session";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   await connectToDatabase();
+  const session = await getCurrentSession();
+  if (!isAdminRole(session?.user.role)) {
+    return errorResponse("Unauthorized.", 401);
+  }
   const payload = await request.json().catch(() => null);
   if (!payload) {
     return errorResponse("Invalid JSON body.", 400);

@@ -9,7 +9,8 @@ type Mode = "password" | "otp";
 export function LoginPanel() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("next") ?? "/account";
+  const requestedNext = searchParams.get("next");
+  const nextPath = requestedNext?.startsWith("/") && !requestedNext.startsWith("//") ? requestedNext : "/account";
   const [mode, setMode] = useState<Mode>("password");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
