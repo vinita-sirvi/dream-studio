@@ -124,9 +124,11 @@ export function CustomOrderForm() {
           className={inputClass}
         />
         <input
+          type="date"
           value={form.deliveryDate}
           onChange={(event) => updateField("deliveryDate", event.target.value)}
-          placeholder="Delivery date"
+          min={new Date().toISOString().slice(0, 10)}
+          aria-label="Preferred delivery date"
           className={inputClass}
         />
       </div>
