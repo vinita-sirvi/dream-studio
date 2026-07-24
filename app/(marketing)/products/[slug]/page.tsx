@@ -37,21 +37,37 @@ export default async function ProductDetailsPage({
     notFound();
   }
 
+  const productImage = [...(product.images ?? [])]
+    .filter((image) => image.type !== "video" && image.url?.trim())
+    .sort(
+      (a, b) =>
+        Number(Boolean(b.isPrimary)) - Number(Boolean(a.isPrimary)) ||
+        (a.sortOrder ?? 0) - (b.sortOrder ?? 0),
+    )[0];
+
   return (
     <main className="mx-auto w-full max-w-[1440px] px-4 py-10 md:px-8 lg:px-10">
       <section className="grid gap-8 lg:grid-cols-[1fr_0.95fr]">
         <div className="overflow-hidden rounded-[2rem] border border-[#eadccc] bg-white shadow-[0_18px_42px_rgba(103,73,47,0.08)]">
-          <div className="aspect-[4/5] bg-[linear-gradient(135deg,#f7e6da,#f0d5ca_45%,#e8c9d2)]">
-            <div className="flex h-full flex-col justify-between p-6">
-              <div className="flex items-start justify-between">
-                <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#2f2319]">
-                  {product.category ?? "Shop"}
-                </span>
-                <span className="rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#2f2319]">
-                  {product.stock} in stock
-                </span>
+          <div className="relative aspect-[4/5] bg-[#f8f1e8]">
+            {productImage ? (
+              <img
+                src={productImage.url}
+                alt={productImage.alt || product.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="grid h-full place-items-center px-8 text-center text-xs font-medium uppercase tracking-[0.16em] text-[#8a7768]">
+                Product image coming soon
               </div>
-              <div className="mx-auto mb-6 h-[62%] w-[58%] rounded-[42%_42%_18%_18%/22%_22%_10%_10%] bg-white/35 shadow-[0_18px_42px_rgba(94,67,43,0.12)]" />
+            )}
+            <div className="absolute left-5 top-5 flex items-start justify-between gap-3 right-5">
+              <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#2f2319]">
+                {product.category ?? "Shop"}
+              </span>
+              <span className="rounded-full bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#2f2319]">
+                {product.stock} in stock
+              </span>
             </div>
           </div>
         </div>

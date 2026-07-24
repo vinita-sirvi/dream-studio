@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { isValidObjectId } from "mongoose";
 
 import { serialize } from "./http";
 import {
@@ -198,8 +199,12 @@ export const getProductBySlug = cache(async (slug: string) => {
 
   await ensureSeedData();
 
+  const identifierQuery = isValidObjectId(slug)
+    ? { $or: [{ slug }, { _id: slug }] }
+    : { slug };
+
   const product = await Product.findOne({
-    slug,
+    ...identifierQuery,
     status: "active",
     visibility: "public",
   })
