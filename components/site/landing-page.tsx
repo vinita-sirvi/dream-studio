@@ -7,6 +7,8 @@ import {
 
 import { Icon } from "./icons";
 import { ProductCard } from "./product-card";
+import { HeroSlider } from "./hero-slider";
+import { OutfitSlider } from "./outfit-slider";
 
 const toneMap = {
   rose: {
@@ -183,16 +185,31 @@ function FeatureItem({
 
 function CategoryTile({
   name,
-  tone,
+  index,
 }: {
   name: string;
-  tone: keyof typeof toneMap;
+  index: number;
 }) {
+  const categoryImages = [
+    "/category-images/kurti.jpg",
+    "/category-images/blouse.jpg",
+    "/category-images/dress.jpg",
+    "/category-images/coord-set.jpg",
+    "/category-images/lehenga.jpg",
+    "/category-images/ethnic-wear.jpg",
+  ];
+
   return (
     <div className="group">
       <div className="overflow-hidden rounded-[1.2rem] border border-[#eadccc] bg-white shadow-[0_14px_30px_rgba(94,67,43,0.06)] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_20px_40px_rgba(94,67,43,0.12)]">
-        <div className="aspect-[4/5]">
-          <VisualArt tone={tone} variant="category" />
+        <div
+          className="aspect-[4/5] bg-[#f8f1e8]"
+        >
+          <img
+            src={categoryImages[index]}
+            alt={`${name} traditional outfit collection`}
+            className="h-full w-full object-cover"
+          />
         </div>
       </div>
       <p className="mt-3 text-center text-[13px] font-medium uppercase tracking-[0.16em] text-[#2f2319]">
@@ -294,31 +311,9 @@ export function LandingPage({ products }: { products: Array<{
             </div>
 
             <div className="relative min-h-[360px] lg:min-h-[640px]">
-              <button
-                type="button"
-                className="absolute left-5 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-[#eadccc] bg-white/85 text-[#2f2319] shadow-sm"
-                aria-label="Previous slide"
-              >
-                <Icon name="chevron-left" className="h-5 w-5" />
-              </button>
-              <button
-                type="button"
-                className="absolute right-5 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full border border-[#eadccc] bg-white/85 text-[#2f2319] shadow-sm"
-                aria-label="Next slide"
-              >
-                <Icon name="chevron-right" className="h-5 w-5" />
-              </button>
-
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(255,255,255,0.6),transparent_25%),linear-gradient(90deg,rgba(255,247,240,0.95),rgba(247,234,223,0.5))]" />
               <div className="absolute inset-y-0 right-0 w-[72%] bg-[linear-gradient(180deg,rgba(254,245,239,0.2),rgba(242,226,210,0.22))]" />
-
-              <div className="absolute inset-x-0 bottom-0 top-0">
-                <VisualArt tone="rose" variant="hero" />
-              </div>
-
-              <div className="absolute left-4 bottom-4 hidden rounded-full border border-[#eadccc] bg-white/75 px-4 py-2 text-xs font-medium text-[#6a5649] shadow-sm md:block">
-                1 / 4
-              </div>
+              <HeroSlider />
             </div>
           </div>
         </div>
@@ -340,8 +335,8 @@ export function LandingPage({ products }: { products: Array<{
       >
         <SectionTitle title="Shop By Category" />
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-          {categories.map((category) => (
-            <CategoryTile key={category.name} {...category} />
+          {categories.map((category, index) => (
+            <CategoryTile key={category.name} {...category} index={index} />
           ))}
         </div>
       </section>
@@ -350,8 +345,8 @@ export function LandingPage({ products }: { products: Array<{
         <div className="overflow-hidden rounded-[1.6rem] border border-[#eadccc] bg-[linear-gradient(135deg,#f6e6da_0%,#f1e0d2_100%)] shadow-[0_14px_36px_rgba(103,73,47,0.07)]">
           <div className="grid items-center gap-8 p-4 md:p-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-10 lg:p-8">
             <div className="overflow-hidden rounded-[1.1rem]">
-              <div className="aspect-[4/3] md:aspect-[16/11]">
-                <VisualArt tone="ivory" variant="process" />
+              <div className="aspect-[4/3] bg-[#ead8c9] md:aspect-[16/11]">
+                <OutfitSlider />
               </div>
             </div>
 
