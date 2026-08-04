@@ -1,10 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+
+import { cn } from "@/lib/cn";
+
+import { Icon } from "./icons";
 
 type Status = "idle" | "loading" | "success" | "error";
 
-export function NewsletterForm() {
+/**
+ * Newsletter subscribe form. Posts to the existing /api/newsletter route.
+ *
+ * Fixes a bug in the previous version, where the status <p> was rendered as a
+ * flex child of the input group and so appeared inline between the field and the
+ * button. The message now sits below the group, in its own aria-live region.
+ */
+export function NewsletterForm({
+  source = "footer",
+  onDark = false,
+  className,
+}: {
+  source?: string;
+  onDark?: boolean;
+  className?: string;
+}) {
+  const inputId = useId();
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [message, setMessage] = useState("");
@@ -14,43 +34,88 @@ export function NewsletterForm() {
     setStatus("loading");
     setMessage("");
 
-    const response = await fetch("/api/newsletter", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, source: "footer" }),
-    });
+    try {
+      const response = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, source }),
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        setStatus("error");
+        setMessage("Please enter a valid email address.");
+        return;
+      }
+
+      setStatus("success");
+      setEmail("");
+      setMessage("Thank you — you're on the list.");
+    } catch {
       setStatus("error");
-      setMessage("Please enter a valid email address.");
-      return;
+      setMessage("Something went wrong. Please try again.");
     }
-
-    setStatus("success");
-    setEmail("");
-    setMessage("Thank you for subscribing.");
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-5 flex max-w-md overflow-hidden rounded-md border border-[#d7c6b3] bg-white">
-      <input
-        type="email"
-        placeholder="Enter your email"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
-        className="min-w-0 flex-1 px-4 py-3 text-sm outline-none placeholder:text-[#9a8c80]"
-        required
-      />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="bg-[#2a1b10] px-5 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#3c2818] disabled:cursor-not-allowed disabled:opacity-70"
+    <form onSubmit={onSubmit} className={cn("w-full max-w-lg", className)}>
+      <label htmlFor={inputId} className="sr-only">
+        Email address
+      </label>
+
+      <div
+        className={cn(
+          "flex items-center gap-3 border-b pb-3 transition-colors focus-within:border-brass",
+          onDark ? "border-on-dark/25" : "border-line-strong",
+        )}
       >
-        {status === "loading" ? "Sending" : "Subscribe"}
-      </button>
-      {message ? (
-        <p className="mt-2 text-xs text-[#8a6b56]">{message}</p>
-      ) : null}
+        <input
+          id={inputId}
+          type="email"
+          name="email"
+          autoComplete="email"
+          required
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="your@email.com"
+          aria-describedby={`${inputId}-status`}
+          aria-invalid={status === "error" || undefined}
+          className={cn(
+            "min-w-0 flex-1 bg-transparent py-1 text-base outline-none",
+            onDark
+              ? "text-on-dark placeholder:text-on-dark-soft/70"
+              : "text-ink placeholder:text-ink-faint",
+          )}
+        />
+        <button
+          type="submit"
+          disabled={status === "loading"}
+          className={cn(
+            "group/sub flex shrink-0 items-center gap-2 text-[11px] font-medium uppercase tracking-[0.18em] transition-opacity disabled:opacity-60",
+            onDark ? "text-brass-soft" : "text-brass-ink",
+          )}
+        >
+          {status === "loading" ? "Sending" : "Subscribe"}
+          <Icon
+            name="arrow-right"
+            className="h-4 w-4 transition-transform duration-300 group-hover/sub:translate-x-1"
+          />
+        </button>
+      </div>
+
+      <p
+        id={`${inputId}-status`}
+        aria-live="polite"
+        role={status === "error" ? "alert" : undefined}
+        className={cn(
+          "mt-3 min-h-5 text-xs leading-5",
+          status === "error" && "text-danger",
+          status === "success" && (onDark ? "text-brass-soft" : "text-success"),
+          (status === "idle" || status === "loading") &&
+            (onDark ? "text-on-dark-soft" : "text-ink-soft"),
+        )}
+      >
+        {message || (status === "idle" ? "No spam. Unsubscribe anytime." : "")}
+      </p>
     </form>
   );
 }

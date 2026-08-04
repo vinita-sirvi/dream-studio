@@ -1,18 +1,13 @@
-import { SectionPage } from "@/components/site/section-page";
+import type { Metadata } from "next";
 
-export default function ReturnPolicyPage() {
-  return (
-    <SectionPage
-      eyebrow="Policies"
-      title="A dedicated return and exchange policy page for post-purchase confidence."
-      description="This page supports customer service expectations and helps reduce friction before checkout."
-      points={[
-        "Clear exchange, return, and refund rules.",
-        "Can be maintained without code changes later.",
-        "Supports trust for premium fashion purchases.",
-      ]}
-      primaryCta={{ label: "Shop", href: "/shop" }}
-      secondaryCta={{ label: "Contact", href: "/contact" }}
-    />
-  );
+import { returnPolicy } from "@/data/policies";
+import { PolicyPage } from "@/components/site/policy-page";
+
+export const metadata: Metadata = {
+  title: "Returns & Exchange",
+  description: returnPolicy.intro,
+};
+
+export default function Page() {
+  return <PolicyPage policy={returnPolicy} />;
 }

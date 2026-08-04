@@ -10,11 +10,86 @@ import { Category, Collection, CustomOrder, Order, Product } from "./models";
 import { ensureSeedData } from "./seed";
 import { demoCategories, demoCollections, demoProducts } from "./demo-data";
 
+export type ShopSort = "newest" | "price-asc" | "price-desc" | "name-asc";
+
 type ShopFilters = {
   q?: string;
   category?: string;
   collection?: string;
+  /** Inclusive lower bound, in rupees. */
+  minPrice?: number;
+  /** Inclusive upper bound, in rupees. */
+  maxPrice?: number;
+  sort?: ShopSort;
 };
+
+type NormalizedProduct = ReturnType<typeof normalizeProduct>;
+
+/**
+ * Shared filter + sort applied to an already-normalized product list, so the
+ * database and demo-fallback paths cannot drift apart.
+ *
+ * Products arrive newest-first from both sources, so "newest" is a no-op.
+ */
+function applyFilters(
+  products: NormalizedProduct[],
+  filters: ShopFilters,
+): NormalizedProduct[] {
+  const query = filters.q?.trim().toLowerCase();
+
+  const filtered = products.filter((product) => {
+    if (query) {
+      const haystack = [
+        product.name,
+        product.description,
+        product.category,
+        product.collection,
+        product.fabric,
+        product.color,
+        ...(product.tags ?? []),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+
+    if (filters.category && product.categorySlug !== filters.category) {
+      return false;
+    }
+
+    if (filters.collection && product.collectionSlug !== filters.collection) {
+      return false;
+    }
+
+    if (
+      typeof filters.minPrice === "number" &&
+      product.price < filters.minPrice
+    ) {
+      return false;
+    }
+
+    if (
+      typeof filters.maxPrice === "number" &&
+      product.price > filters.maxPrice
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  switch (filters.sort) {
+    case "price-asc":
+      return filtered.sort((a, b) => a.price - b.price);
+    case "price-desc":
+      return filtered.sort((a, b) => b.price - a.price);
+    case "name-asc":
+      return filtered.sort((a, b) => a.name.localeCompare(b.name));
+    default:
+      return filtered;
+  }
+}
 
 function productTone(value: string | undefined, fallbackIndex = 0) {
   const key = (value ?? "").toLowerCase();
@@ -77,52 +152,43 @@ function fallbackShopData(filters: ShopFilters = {}) {
     description: collection.description,
   }));
 
-  const products = demoProducts
-    .map((product, index) => normalizeProduct({ ...product, _id: product.slug }, index))
-    .filter((product) => {
-      const query = filters.q?.toLowerCase();
-      if (query) {
-        const haystack = [
-          product.name,
-          product.description,
-          product.category,
-          product.collection,
-          ...(product.tags ?? []),
-        ]
-          .join(" ")
-          .toLowerCase();
-        if (!haystack.includes(query)) {
-          return false;
-        }
-      }
-
-      if (filters.category && product.categorySlug !== filters.category) {
-        return false;
-      }
-
-      if (filters.collection && product.collectionSlug !== filters.collection) {
-        return false;
-      }
-
-      return true;
-    });
+  const allProducts = demoProducts.map((product, index) =>
+    normalizeProduct({ ...product, _id: product.slug }, index),
+  );
 
   return {
     categories,
     collections,
-    products,
-    featuredProducts: products.slice(0, 4),
+    products: applyFilters(allProducts, filters),
+    // Featured is always the newest four, independent of the active filters.
+    featuredProducts: allProducts.slice(0, 4),
+    priceRange: priceRangeOf(allProducts),
+  };
+}
+
+/** Min/max selling price across the catalogue, for the price filter bounds. */
+function priceRangeOf(products: NormalizedProduct[]) {
+  if (!products.length) return { min: 0, max: 0 };
+  const prices = products.map((product) => product.price);
+  return {
+    min: Math.floor(Math.min(...prices)),
+    max: Math.ceil(Math.max(...prices)),
   };
 }
 
 export const getShopData = cache(async (filters: ShopFilters = {}) => {
+  // Fall back to the bundled demo catalogue when there is no database. Previously
+  // these branches returned empty arrays, which left the home and shop pages
+  // blank on a fresh checkout even though getProductBySlug() already fell back
+  // to the same data — an inconsistency, since fallbackShopData() existed and
+  // was only used elsewhere.
   if (!isDatabaseConfigured()) {
-    return { categories: [], collections: [], products: [], featuredProducts: [] };
+    return fallbackShopData(filters);
   }
 
   const connected = await tryConnectToDatabase();
   if (!connected) {
-    return { categories: [], collections: [], products: [], featuredProducts: [] };
+    return fallbackShopData(filters);
   }
 
   await ensureSeedData();
@@ -140,40 +206,16 @@ export const getShopData = cache(async (filters: ShopFilters = {}) => {
       .lean(),
   ]);
 
-  const normalizedProducts = (products as any[]).map((product, index) => normalizeProduct(product, index));
-  const filteredProducts = normalizedProducts.filter((product) => {
-    const query = filters.q?.toLowerCase();
-    if (query) {
-      const haystack = [
-        product.name,
-        product.description,
-        product.category,
-        product.collection,
-        ...(product.tags ?? []),
-      ]
-        .join(" ")
-        .toLowerCase();
-      if (!haystack.includes(query)) {
-        return false;
-      }
-    }
-
-    if (filters.category && product.categorySlug !== filters.category) {
-      return false;
-    }
-
-    if (filters.collection && product.collectionSlug !== filters.collection) {
-      return false;
-    }
-
-    return true;
-  });
+  const normalizedProducts = (products as any[]).map((product, index) =>
+    normalizeProduct(product, index),
+  );
 
   return {
     categories: serialize(categories),
     collections: serialize(collections),
-    products: filteredProducts,
+    products: applyFilters(normalizedProducts, filters),
     featuredProducts: normalizedProducts.slice(0, 4),
+    priceRange: priceRangeOf(normalizedProducts),
   };
 });
 

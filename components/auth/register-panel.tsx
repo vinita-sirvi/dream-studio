@@ -3,10 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { Field, FormStatus, Input } from "@/components/ui/field";
+import { Icon } from "@/components/site/icons";
+
+/**
+ * Account creation. POST /api/auth/register then straight to /account —
+ * unchanged from the original implementation.
+ */
 export function RegisterPanel() {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [message, setMessage] = useState("");
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -23,7 +33,7 @@ export function RegisterPanel() {
     const data = await response.json().catch(() => null);
     if (!response.ok) {
       setStatus("error");
-      setMessage(data?.message ?? "Could not create account.");
+      setMessage(data?.message ?? "Could not create the account.");
       return;
     }
 
@@ -33,39 +43,78 @@ export function RegisterPanel() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 rounded-[2rem] border border-[#eadccc] bg-white/85 p-6 shadow-[0_18px_42px_rgba(103,73,47,0.08)] md:p-8">
-      <input
-        type="text"
+    <form onSubmit={onSubmit} className="grid gap-5">
+      <Field label="Your name" htmlFor="register-name" required>
+        <Input
+          id="register-name"
+          type="text"
+          autoComplete="name"
+          required
+          value={form.name}
+          onChange={(event) =>
+            setForm((current) => ({ ...current, name: event.target.value }))
+          }
+        />
+      </Field>
+
+      <Field label="Email address" htmlFor="register-email" required>
+        <Input
+          id="register-email"
+          type="email"
+          autoComplete="email"
+          required
+          value={form.email}
+          onChange={(event) =>
+            setForm((current) => ({ ...current, email: event.target.value }))
+          }
+        />
+      </Field>
+
+      <Field
+        label="Password"
+        htmlFor="register-password"
+        hint="At least eight characters."
         required
-        placeholder="Name"
-        value={form.name}
-        onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
-        className="rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
-      />
-      <input
-        type="email"
-        required
-        placeholder="Email"
-        value={form.email}
-        onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))}
-        className="rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
-      />
-      <input
-        type="password"
-        required
-        placeholder="Password"
-        value={form.password}
-        onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
-        className="rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
-      />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="rounded-md bg-[#3b2417] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#533521] disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {status === "loading" ? "Creating" : "Create Account"}
-      </button>
-      {message ? <p className="text-sm text-[#8a6b56]">{message}</p> : null}
+        <Input
+          id="register-password"
+          type="password"
+          autoComplete="new-password"
+          minLength={8}
+          required
+          value={form.password}
+          onChange={(event) =>
+            setForm((current) => ({ ...current, password: event.target.value }))
+          }
+        />
+      </Field>
+
+      <Button
+        type="submit"
+        size="lg"
+        disabled={status === "loading"}
+        className="mt-1 w-full"
+      >
+        {status === "loading" ? "Creating account…" : "Create account"}
+        <Icon name="arrow-right" className="h-4 w-4" />
+      </Button>
+
+      <FormStatus status={status} message={message} />
+
+      <p className="text-xs leading-6 text-ink-soft">
+        By creating an account you agree to our{" "}
+        <a href="/terms" className="text-brass-ink underline underline-offset-2">
+          terms
+        </a>{" "}
+        and{" "}
+        <a
+          href="/privacy-policy"
+          className="text-brass-ink underline underline-offset-2"
+        >
+          privacy policy
+        </a>
+        .
+      </p>
     </form>
   );
 }

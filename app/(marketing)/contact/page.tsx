@@ -1,46 +1,146 @@
+import type { Metadata } from "next";
+import { Suspense } from "react";
+
+import { IMAGES } from "@/data/home";
+import { brandContact, socialLinks } from "@/data/navigation";
 import { ContactForm } from "@/components/site/contact-form";
+import { PageHero } from "@/components/site/page-hero";
+import { Icon } from "@/components/site/icons";
+import { Reveal } from "@/components/motion/reveal";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Talk to the studio about fit, fabric, a commission, or an existing order. We reply within one working day.",
+};
+
+const CHANNELS = [
+  {
+    icon: "whatsapp" as const,
+    label: "WhatsApp",
+    value: brandContact.phone,
+    href: "https://wa.me/919876543210",
+    note: "Fastest for fit and fabric questions — send a photograph.",
+  },
+  {
+    icon: "mail" as const,
+    label: "Email",
+    value: brandContact.email,
+    href: `mailto:${brandContact.email}`,
+    note: "Best for commissions and anything with attachments.",
+  },
+  {
+    icon: "phone" as const,
+    label: "Telephone",
+    value: brandContact.phone,
+    href: `tel:${brandContact.phone.replace(/\s/g, "")}`,
+    note: brandContact.hours,
+  },
+];
 
 export default function ContactPage() {
   return (
-    <section className="mx-auto grid min-h-[72vh] w-full max-w-[1440px] gap-8 px-4 py-16 md:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
-      <div className="rounded-[2rem] border border-[#eadccc] bg-white/80 p-8 shadow-[0_18px_42px_rgba(103,73,47,0.08)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8a6b56]">
-          Contact
-        </p>
-        <h1
-          className="mt-4 text-4xl font-medium text-[#2f2319] md:text-6xl"
-          style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-        >
-          Let’s talk about your next outfit.
-        </h1>
-        <p className="mt-5 max-w-xl text-base leading-8 text-[#5f4f43]">
-          Reach out for support, fitting questions, custom stitching, and order
-          updates. Our team is available during the working hours below.
-        </p>
+    <>
+      <PageHero
+        eyebrow="Contact"
+        title="Tell us what you have in mind"
+        description="Whether it is a question about fabric, a fitting problem, or a commission you have been thinking about for months — start here."
+        image={IMAGES.kurti}
+        crumbs={[{ label: "Contact" }]}
+      />
 
-        <div className="mt-8 grid gap-4 text-sm text-[#49382d]">
-          <div className="rounded-2xl border border-[#eadccc] bg-[#fbf6ef] px-5 py-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[#8a6b56]">
-              WhatsApp
-            </div>
-            <div className="mt-1 font-medium">+91 98765 43210</div>
-          </div>
-          <div className="rounded-2xl border border-[#eadccc] bg-[#fbf6ef] px-5 py-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[#8a6b56]">
-              Email
-            </div>
-            <div className="mt-1 font-medium">support@divyaanddesign.com</div>
-          </div>
-          <div className="rounded-2xl border border-[#eadccc] bg-[#fbf6ef] px-5 py-4">
-            <div className="text-xs uppercase tracking-[0.2em] text-[#8a6b56]">
-              Hours
-            </div>
-            <div className="mt-1 font-medium">Mon - Sat | 10 AM - 7 PM</div>
+      <section className="shell grid gap-14 py-16 md:py-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-20">
+        {/* Channels */}
+        <div>
+          <Reveal stagger={0.08} className="grid gap-px bg-line">
+            {CHANNELS.map((channel) => (
+              <a
+                key={channel.label}
+                href={channel.href}
+                target={channel.href.startsWith("http") ? "_blank" : undefined}
+                rel={
+                  channel.href.startsWith("http")
+                    ? "noreferrer noopener"
+                    : undefined
+                }
+                className="group/ch flex gap-5 bg-canvas py-6 transition-colors hover:bg-brass-wash"
+              >
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line text-brass transition-colors group-hover/ch:border-brass">
+                  <Icon name={channel.icon} className="h-5 w-5" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+                    {channel.label}
+                  </span>
+                  <span className="mt-1 block truncate font-display text-lg text-ink">
+                    {channel.value}
+                  </span>
+                  <span className="mt-1 block text-xs leading-6 text-ink-soft">
+                    {channel.note}
+                  </span>
+                </span>
+              </a>
+            ))}
+          </Reveal>
+
+          {/* Studio */}
+          <Reveal
+            direction="up"
+            className="mt-10 rounded-card border border-line bg-canvas-warm p-7"
+          >
+            <p className="eyebrow text-brass-ink">The Atelier</p>
+            <address className="mt-4 text-sm not-italic leading-7 text-ink-soft">
+              {brandContact.address}
+            </address>
+            <p className="mt-4 flex gap-2.5 text-sm text-ink-soft">
+              <Icon name="clock" className="mt-1 h-4 w-4 shrink-0 text-brass" />
+              {brandContact.hours}
+            </p>
+            <p className="mt-5 border-t border-line pt-5 text-xs leading-6 text-ink-soft">
+              No appointment needed to browse fabric. Fittings are by appointment
+              so a tailor is free to see you properly.
+            </p>
+          </Reveal>
+
+          {/* Social */}
+          <div className="mt-8">
+            <p className="eyebrow text-ink-faint">Elsewhere</p>
+            <ul className="mt-4 flex gap-2.5">
+              {socialLinks.map((social) => (
+                <li key={social.label}>
+                  <a
+                    href={social.href}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    aria-label={social.label}
+                    className="grid h-11 w-11 place-items-center rounded-full border border-line text-brass-ink transition-colors hover:border-brass hover:bg-brass-wash"
+                  >
+                    <Icon name={social.icon} className="h-[18px] w-[18px]" />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </div>
 
-      <ContactForm />
-    </section>
+        {/* Form */}
+        <div>
+          <h2 className="display-md text-ink">Send a message</h2>
+          <p className="mt-3 max-w-lg text-sm leading-7 text-ink-soft">
+            We reply within one working day. If your question is about fit, a
+            photograph in the message saves a lot of back and forth.
+          </p>
+          {/* ContactForm reads `?subject=` via useSearchParams, which needs a
+              Suspense boundary so this page can still be statically rendered. */}
+          <Suspense
+            fallback={
+              <div className="mt-9 h-[32rem] rounded-panel border border-line bg-surface" />
+            }
+          >
+            <ContactForm />
+          </Suspense>
+        </div>
+      </section>
+    </>
   );
 }

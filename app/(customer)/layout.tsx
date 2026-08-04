@@ -1,7 +1,21 @@
-import { customerLinks } from "@/data/navigation";
-import { getCurrentSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 
+import { getCurrentSession } from "@/lib/session";
+import { SiteFooter } from "@/components/site/footer";
+import { SiteHeader } from "@/components/site/header";
+import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { AccountNav } from "@/components/site/account/account-nav";
+
+/**
+ * Signed-in customer area.
+ *
+ * Auth behaviour is unchanged: no session means a redirect to
+ * /login?next=/account.
+ *
+ * Previously this group rendered without the site header or footer, so the
+ * account pages felt like a different application. They now sit inside the same
+ * chrome as the storefront.
+ */
 export default async function CustomerLayout({
   children,
 }: {
@@ -11,24 +25,21 @@ export default async function CustomerLayout({
   if (!session) redirect("/login?next=/account");
 
   return (
-    <div className="mx-auto grid min-h-[72vh] w-full max-w-[1440px] gap-6 px-4 py-10 md:grid-cols-[280px_1fr] md:px-8">
-      <aside className="rounded-[2rem] border border-[#eadccc] bg-white/80 p-6 shadow-[0_16px_36px_rgba(103,73,47,0.06)]">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8a6b56]">
-          My Account
-        </p>
-        <nav className="mt-6 space-y-2">
-          {customerLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="block rounded-2xl border border-[#eadccc] px-4 py-3 text-sm text-[#3b2417] transition hover:bg-[#fbf6ef]"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      </aside>
-      <div>{children}</div>
-    </div>
+    <>
+      <SmoothScroll />
+      <SiteHeader />
+
+      <main id="main" className="flex-1">
+        <div className="shell grid gap-10 py-14 md:py-20 lg:grid-cols-[17rem_1fr] lg:gap-16">
+          <AccountNav
+            userName={session.user.name}
+            userEmail={session.user.email}
+          />
+          <div className="min-w-0">{children}</div>
+        </div>
+      </main>
+
+      <SiteFooter />
+    </>
   );
 }

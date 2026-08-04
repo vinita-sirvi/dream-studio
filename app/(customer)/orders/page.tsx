@@ -1,18 +1,36 @@
-import { SectionPage } from "@/components/site/section-page";
+import type { Metadata } from "next";
 
+import {
+  AccountEmpty,
+  AccountHeader,
+} from "@/components/site/account/account-panel";
+
+export const metadata: Metadata = { title: "My Orders" };
+
+/**
+ * Order history.
+ *
+ * There is no per-user order query in lib/storefront.ts — orders are only read in
+ * aggregate for the admin dashboard — so this shows a real empty state instead of
+ * placeholder rows. Wiring it up needs a `getOrdersForUser(userId)` helper.
+ */
 export default function OrdersPage() {
   return (
-    <SectionPage
-      eyebrow="Orders"
-      title="Order history, timelines, invoices, and delivery tracking."
-      description="Designed to show the full order lifecycle from confirmed to delivered, with support for returns and refunds."
-      points={[
-        "Supports order status timeline states.",
-        "Invoice and shipping label access later.",
-        "Good foundation for customer notifications.",
-      ]}
-      primaryCta={{ label: "Track Order", href: "/track-order" }}
-      secondaryCta={{ label: "Shop", href: "/shop" }}
-    />
+    <>
+      <AccountHeader
+        eyebrow="Orders"
+        title="Your order history"
+        description="Every commission and purchase, with its current stage in the workroom."
+        action={{ label: "Track a parcel", href: "/track-order" }}
+      />
+
+      <AccountEmpty
+        icon="box"
+        title="No orders yet"
+        description="Once you place an order it will appear here, with its stage from cutting through to dispatch."
+        primaryCta={{ label: "Browse the catalogue", href: "/shop" }}
+        secondaryCta={{ label: "Commission a piece", href: "/custom-order" }}
+      />
+    </>
   );
 }

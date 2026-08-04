@@ -3,7 +3,7 @@ export const demoCategories = [
     name: "Kurtis",
     slug: "kurtis",
     description: "Elegant everyday and occasion kurtis with refined detailing.",
-    image: "/demo/categories/kurtis.jpg",
+    image: "/category-images/kurti.jpg",
     sortOrder: 1,
     featured: true,
   },
@@ -11,7 +11,7 @@ export const demoCategories = [
     name: "Blouses",
     slug: "blouses",
     description: "Statement blouse designs tailored for Indian silhouettes.",
-    image: "/demo/categories/blouses.jpg",
+    image: "/category-images/blouse.jpg",
     sortOrder: 2,
     featured: true,
   },
@@ -19,7 +19,7 @@ export const demoCategories = [
     name: "Dresses",
     slug: "dresses",
     description: "Minimal dresses with a premium fashion-forward finish.",
-    image: "/demo/categories/dresses.jpg",
+    image: "/category-images/dress.jpg",
     sortOrder: 3,
     featured: true,
   },
@@ -27,7 +27,7 @@ export const demoCategories = [
     name: "Co-ord Sets",
     slug: "co-ord-sets",
     description: "Stylish matching sets for modern everyday dressing.",
-    image: "/demo/categories/co-ord-sets.jpg",
+    image: "/category-images/coord-set.jpg",
     sortOrder: 4,
     featured: true,
   },
@@ -35,7 +35,7 @@ export const demoCategories = [
     name: "Lehengas",
     slug: "lehengas",
     description: "Occasion-ready lehengas with bridal and festive appeal.",
-    image: "/demo/categories/lehengas.jpg",
+    image: "/category-images/lehenga.jpg",
     sortOrder: 5,
     featured: true,
   },
@@ -48,7 +48,7 @@ export const demoCollections = [
     description: "Freshly launched premium pieces.",
     featured: true,
     status: "active" as const,
-    heroImage: "/demo/collections/new-arrivals.jpg",
+    heroImage: "/category-images/kurti.jpg",
   },
   {
     name: "Festive Edit",
@@ -56,7 +56,7 @@ export const demoCollections = [
     description: "Rich colors and celebration-ready outfits.",
     featured: true,
     status: "active" as const,
-    heroImage: "/demo/collections/festive-edit.jpg",
+    heroImage: "/category-images/ethnic-wear.jpg",
   },
   {
     name: "Wedding Collection",
@@ -64,7 +64,7 @@ export const demoCollections = [
     description: "Statement garments for weddings and special events.",
     featured: true,
     status: "active" as const,
-    heroImage: "/demo/collections/wedding-collection.jpg",
+    heroImage: "/category-images/lehenga.jpg",
   },
   {
     name: "Editor’s Picks",
@@ -72,7 +72,7 @@ export const demoCollections = [
     description: "Handpicked looks curated by the atelier team.",
     featured: true,
     status: "active" as const,
-    heroImage: "/demo/collections/editors-picks.jpg",
+    heroImage: "/category-images/dress.jpg",
   },
 ];
 
@@ -106,7 +106,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/kurti.jpg",
+        alt: "Floral printed A-line kurti",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Embroidered Straight Kurti",
@@ -133,7 +141,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/ethnic-wear.jpg",
+        alt: "Embroidered straight kurti",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Chikankari Kurti Set",
@@ -160,7 +176,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/kurti.jpg",
+        alt: "Chikankari kurti set",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Mirror Work Co-ord Set",
@@ -187,7 +211,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/coord-set.jpg",
+        alt: "Mirror work co-ord set",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Designer Lehenga",
@@ -214,7 +246,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/lehenga.jpg",
+        alt: "Designer bridal lehenga",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Pastel Shirt Dress",
@@ -241,7 +281,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: false },
-    images: [],
+    images: [
+      {
+        url: "/category-images/dress.jpg",
+        alt: "Pastel shirt dress",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Ivory Occasion Dress",
@@ -268,7 +316,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: false },
-    images: [],
+    images: [
+      {
+        url: "/category-images/dress.jpg",
+        alt: "Ivory occasion dress",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
   {
     name: "Royal Blouse",
@@ -295,7 +351,15 @@ export const demoProducts = [
     status: "active" as const,
     visibility: "public" as const,
     customization: { enabled: true },
-    images: [],
+    images: [
+      {
+        url: "/category-images/blouse.jpg",
+        alt: "Royal silk blouse",
+        type: "image" as const,
+        isPrimary: true,
+        sortOrder: 0,
+      },
+    ],
   },
 ] as const;
 

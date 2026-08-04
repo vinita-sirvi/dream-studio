@@ -1,38 +1,444 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ==========================================================================
+   Divya & Design — design tokens
+   Direction: "Refined warm atelier". Warm bone canvas, deep cocoa ink,
+   antique brass accent.
+
+   Contrast note: every text token below is AA-verified against --color-canvas
+   (#FBF7F2). `brass` measures 3.5:1 so it is valid for LARGE text, borders and
+   icons only; use `brass-ink` (6.0:1) for any small accent text.
+   ========================================================================== */
+
+@theme {
+  /* -- Surfaces ---------------------------------------------------------- */
+  --color-canvas: #fbf7f2; /* page background        */
+  --color-canvas-warm: #f6efe5; /* alternating sections   */
+  --color-surface: #ffffff; /* cards                  */
+  --color-surface-sunk: #f3ece2; /* insets, wells          */
+
+  /* -- Text -------------------------------------------------------------- */
+  --color-ink: #241a12; /* 15.1:1  headings, body */
+  --color-ink-soft: #6b5b4e; /*  6.0:1  secondary text */
+  --color-ink-faint: #8a7a6c; /*  4.0:1  LARGE text only */
+
+  /* -- Accent ------------------------------------------------------------ */
+  --color-brass: #a67c4e; /*  3.5:1  large text / borders / icons */
+  --color-brass-ink: #7a5730; /*  6.0:1  small accent text */
+  --color-brass-soft: #d9c3a3; /* decorative fills */
+  --color-brass-wash: #f0e4d3; /* tinted backgrounds */
+
+  /* -- Inverted ---------------------------------------------------------- */
+  --color-espresso: #2a1b10; /* dark sections */
+  --color-espresso-soft: #3f2c1d;
+  --color-on-dark: #f5eee4;
+  --color-on-dark-soft: #c9b7a3; /* 6.2:1 on espresso */
+
+  /* -- Lines ------------------------------------------------------------- */
+  --color-line: #e6d9c8;
+  --color-line-strong: #d3c0a8;
+
+  /* -- Status ------------------------------------------------------------ */
+  --color-success: #4a6b45;
+  --color-danger: #96392f;
+
+  /* -- Type -------------------------------------------------------------- */
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-sans: var(--font-jost), ui-sans-serif, system-ui, sans-serif;
+
+  /* -- Motion ------------------------------------------------------------ */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+
+  /* -- Radii ------------------------------------------------------------- */
+  --radius-card: 1.25rem;
+  --radius-panel: 2rem;
+
+  /* -- Shadows ----------------------------------------------------------- */
+  --shadow-soft: 0 1px 2px rgba(36, 26, 18, 0.04),
+    0 8px 24px -12px rgba(36, 26, 18, 0.1);
+  --shadow-lift: 0 2px 4px rgba(36, 26, 18, 0.04),
+    0 18px 40px -16px rgba(36, 26, 18, 0.16);
+  --shadow-float: 0 4px 8px rgba(36, 26, 18, 0.05),
+    0 32px 64px -24px rgba(36, 26, 18, 0.22);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
-  --font-mono: "Courier New", Courier, monospace;
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  /* NOTE: `scroll-behavior: smooth` is deliberately NOT set here.
+     1. Next.js 16 no longer neutralises it during route transitions, so it
+        would make every client navigation slowly glide to the top.
+     2. Lenis owns smooth scrolling in JS; CSS smooth scroll fights it. */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 6rem; /* clears the sticky header on #anchor jumps */
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Visible, consistent keyboard focus. Never remove without replacement. */
+  :focus-visible {
+    outline: 2px solid var(--color-brass-ink);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-brass-soft);
+    color: var(--color-ink);
+  }
+
+  /* Cross-browser field reset so inputs inherit the brand type */
+  input,
+  textarea,
+  select,
+  button {
+    font: inherit;
+    color: inherit;
+  }
 }
 
-body {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.8), transparent 28%),
-    linear-gradient(180deg, #f9f1e8 0%, #f6ede4 100%);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+
+@utility text-balance {
+  text-wrap: balance;
 }
 
-html {
-  scroll-behavior: smooth;
+/* Fluid display scale — clamps mean headings never need breakpoint variants */
+@utility display-hero {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 8vw, 7rem);
+  line-height: 0.95;
+  font-weight: 300;
+  letter-spacing: -0.02em;
 }
 
-.font-display {
-  font-family: Georgia, "Times New Roman", serif;
+@utility display-xl {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 4.25rem);
+  line-height: 1;
+  font-weight: 300;
+  letter-spacing: -0.015em;
 }
 
-.font-script {
-  font-family: "Brush Script MT", "Segoe Script", cursive;
+@utility display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(1.875rem, 3.5vw, 3rem);
+  line-height: 1.08;
+  font-weight: 300;
 }
 
-* {
-  box-sizing: border-box;
+@utility display-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2.125rem);
+  line-height: 1.15;
+  font-weight: 300;
+}
+
+/* The small uppercase label used above most section headings */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+@utility shell {
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 3rem;
+  }
+}
+
+@utility shell-narrow {
+  width: 100%;
+  max-width: 52rem;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Frosted panel used by the header, overlays and quick view */
+@utility glass {
+  background-color: color-mix(in oklab, var(--color-canvas) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+@utility glass-dark {
+  background-color: color-mix(in oklab, var(--color-espresso) 62%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+@utility hairline {
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* Screen-reader-only, but focusable (used by the skip link) */
+@utility sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  &:focus-visible {
+    position: fixed;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+  }
+}
+
+/* ==========================================================================
+   Motion
+   --------------------------------------------------------------------------
+   Every "hidden until revealed" rule is scoped under html.motion-ready, a
+   class added by <SmoothScroll> only after it has confirmed it will animate
+   (JS running, and prefers-reduced-motion not set).
+
+   Consequence: with JS disabled, mid-hydration, or under reduced motion, none
+   of these rules match and ALL content renders visible. No blank sections,
+   no flash of missing content.
+   ========================================================================== */
+
+@layer components {
+  .motion-ready [data-reveal] {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .motion-ready [data-reveal="up"] {
+    transform: translate3d(0, 2.5rem, 0);
+  }
+  .motion-ready [data-reveal="down"] {
+    transform: translate3d(0, -2rem, 0);
+  }
+  .motion-ready [data-reveal="left"] {
+    transform: translate3d(2.5rem, 0, 0);
+  }
+  .motion-ready [data-reveal="right"] {
+    transform: translate3d(-2.5rem, 0, 0);
+  }
+  .motion-ready [data-reveal="scale"] {
+    transform: scale(0.94);
+  }
+  .motion-ready [data-reveal="fade"] {
+    transform: none;
+  }
+
+  /* Staggered variant: the wrapper stays visible, its direct children hide. */
+  .motion-ready [data-reveal-group] > * {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+  .motion-ready [data-reveal-group="up"] > * {
+    transform: translate3d(0, 2.5rem, 0);
+  }
+  .motion-ready [data-reveal-group="down"] > * {
+    transform: translate3d(0, -2rem, 0);
+  }
+  .motion-ready [data-reveal-group="left"] > * {
+    transform: translate3d(2.5rem, 0, 0);
+  }
+  .motion-ready [data-reveal-group="right"] > * {
+    transform: translate3d(-2.5rem, 0, 0);
+  }
+  .motion-ready [data-reveal-group="scale"] > * {
+    transform: scale(0.94);
+  }
+  .motion-ready [data-reveal-group="fade"] > * {
+    transform: none;
+  }
+
+  /* Image reveal: the mask retreats to uncover the photo. These match the
+     `from` values in <ImageReveal> and only exist to prevent a one-frame flash
+     of the un-masked image before GSAP takes over. */
+  .motion-ready [data-image-reveal] > * {
+    will-change: clip-path, transform;
+  }
+  .motion-ready [data-image-reveal="bottom"] > * {
+    clip-path: inset(0 0 100% 0);
+  }
+  .motion-ready [data-image-reveal="top"] > * {
+    clip-path: inset(100% 0 0 0);
+  }
+  .motion-ready [data-image-reveal="left"] > * {
+    clip-path: inset(0 100% 0 0);
+  }
+  .motion-ready [data-image-reveal="right"] > * {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  /* SplitType line/word wrapper — needs overflow clipping for the rise-up */
+  .split-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.06em; /* stops descenders being clipped */
+  }
+
+  /* Once GSAP finishes, release the compositor hint */
+  [data-motion-done] {
+    will-change: auto;
+  }
+}
+
+/* Belt-and-braces: even if motion-ready is somehow set, honour the OS setting */
+@media (prefers-reduced-motion: reduce) {
+  html:not(.force-motion) *,
+  html:not(.force-motion) *::before,
+  html:not(.force-motion) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .motion-ready [data-reveal],
+  .motion-ready [data-reveal-group] > *,
+  .motion-ready [data-image-reveal] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+}
+
+/* Hero scroll cue */
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(200%);
+  }
+}
+
+/* Mobile nav item stagger */
+@keyframes nav-item-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+}
+
+/* Mega-menu entrance */
+@keyframes mega-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -0.75rem, 0);
+  }
+}
+
+/* Loading skeleton shimmer */
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@utility animate-shimmer {
+  animation: shimmer 1.6s linear infinite;
+  background-position: 200% 0;
+}
+
+/* Overlay entrances (Dialog / Drawer). Suppressed under reduced motion by the
+   global transition/animation reset above. */
+@keyframes drawer-in-right {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+@keyframes drawer-in-left {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+/* Lenis — required for the virtual scroller to drive layout correctly */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   View transitions (experimental.viewTransition)
+   Browsers without support simply skip these and navigate instantly.
+   ========================================================================== */
+
+::view-transition-old(page-root) {
+  animation: vt-fade-out 240ms var(--ease-out-quart) both;
+}
+::view-transition-new(page-root) {
+  animation: vt-fade-in 320ms var(--ease-out-expo) both;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -0.5rem, 0);
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(page-root),
+  ::view-transition-new(page-root) {
+    animation: none;
+  }
 }
