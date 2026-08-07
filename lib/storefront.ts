@@ -273,6 +273,71 @@ export const getProductBySlug = cache(async (slug: string) => {
   };
 });
 
+export type CustomerOrder = {
+  id: string;
+  orderId: string;
+  status: string;
+  placedAt: string | null;
+  grandTotal: number;
+  itemCount: number;
+  items: { name: string; quantity: number; price: number }[];
+  timeline: { status: string; note: string | null; at: string | null }[];
+};
+
+/**
+ * A customer's own orders.
+ *
+ * This helper is what the account order history was missing — orders were only
+ * ever read in aggregate for the admin dashboard, so `/orders` had nothing to show
+ * and rendered a permanent empty state.
+ *
+ * Matches on the user id *or* the account's email, so an order placed as a guest
+ * before signing up still appears once that address has an account.
+ */
+export const getOrdersForUser = cache(
+  async ({
+    userId,
+    email,
+  }: {
+    userId: string;
+    email: string;
+  }): Promise<CustomerOrder[]> => {
+    if (!isDatabaseConfigured()) return [];
+
+    const connected = await tryConnectToDatabase();
+    if (!connected) return [];
+
+    const orders = await Order.find({
+      $or: [{ userId }, { email: email.toLowerCase() }],
+    })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .lean();
+
+    return (orders as any[]).map((order) => ({
+      id: String(order._id),
+      orderId: order.orderId,
+      status: order.status ?? "pending",
+      placedAt: order.createdAt ? new Date(order.createdAt).toISOString() : null,
+      grandTotal: order.totals?.grandTotal ?? 0,
+      itemCount: (order.items ?? []).reduce(
+        (sum: number, item: any) => sum + (item.quantity ?? 0),
+        0,
+      ),
+      items: (order.items ?? []).map((item: any) => ({
+        name: item.name ?? "Piece",
+        quantity: item.quantity ?? 1,
+        price: item.price ?? 0,
+      })),
+      timeline: (order.timeline ?? []).map((entry: any) => ({
+        status: entry.status ?? "",
+        note: entry.note ?? null,
+        at: entry.at ?? null,
+      })),
+    }));
+  },
+);
+
 export const getAdminSummary = cache(async () => {
   if (!isDatabaseConfigured()) {
     return {

@@ -67,7 +67,10 @@ export function OrderForm({
       giftWrap: false,
     };
 
-    const response = await fetch(mode === "create" ? "/api/orders" : `/api/admin/orders/${orderId}`, {
+    // Staff-entered orders go to the admin endpoint. `/api/orders` is the
+    // customer checkout route: it builds an order from the caller's own cart and
+    // ignores any items in the body, so it cannot serve this form.
+    const response = await fetch(mode === "create" ? "/api/admin/orders" : `/api/admin/orders/${orderId}`, {
       method: mode === "create" ? "POST" : "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),

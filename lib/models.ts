@@ -103,7 +103,14 @@ const userSchema = new Schema(
     googleId: String,
     otpHash: String,
     otpExpiresAt: Date,
+    /**
+     * Failed verification attempts for the current code. A six-digit OTP is only
+     * a million guesses; without a per-code ceiling an attacker can simply walk
+     * the range while the code is live.
+     */
+    otpAttempts: { type: Number, default: 0 },
     emailVerifiedAt: Date,
+    lastLoginAt: Date,
     preferences: {
       marketingEmails: { type: Boolean, default: true },
       orderUpdates: { type: Boolean, default: true },

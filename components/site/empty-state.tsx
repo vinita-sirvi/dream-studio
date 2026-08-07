@@ -8,11 +8,11 @@ import { Icon } from "./icons";
 type IconName = Parameters<typeof Icon>[0]["name"];
 
 /**
- * Designed empty state, used by /cart, /checkout and /wishlist.
+ * Designed empty state for a page with nothing to show yet.
  *
- * These routes have no backing implementation in this codebase (no cart API, no
- * persisted wishlist), so rather than fake a working feature they present an
- * intentional, on-brand empty state that routes people somewhere useful.
+ * Used where a real, working feature happens to have no records — an empty
+ * checkout, a completed order — rather than as a stand-in for something
+ * unimplemented.
  */
 export function EmptyState({
   icon,

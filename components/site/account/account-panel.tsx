@@ -45,9 +45,9 @@ export function AccountHeader({
 /**
  * Empty state for an account section that has no records yet.
  *
- * The account pages have no data-fetching implementation in this codebase — no
- * per-user order, address or measurement queries exist — so each page presents
- * its real empty state rather than fabricated rows.
+ * Genuinely empty, not a placeholder: orders, addresses and measurement profiles
+ * are all read per-user now, so this renders only when the customer really has
+ * none.
  */
 export function AccountEmpty({
   icon,

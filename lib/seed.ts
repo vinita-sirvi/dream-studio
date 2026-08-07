@@ -15,6 +15,25 @@ import { demoCategories, demoCollections, demoOrders, demoProducts, demoUsers } 
 
 let seedPromise: Promise<boolean> | null = null;
 
+/**
+ * Whether the bundled demo catalogue may be written to the database.
+ *
+ * This matters a great deal more than it looks. `ensureSeedData()` is awaited by
+ * `getShopData()`, `getProductBySlug()` and `getAdminSummary()` — that is, by the
+ * home page. So on a fresh production database the first visitor used to trigger
+ * a seed that created `admin@divyaanddesign.com` with the password
+ * `Admin@12345!`, a value committed to this repository in `lib/demo-data.ts`.
+ * Anyone who had seen the source had admin.
+ *
+ * Demo seeding is therefore development-only unless explicitly opted into, and
+ * the seeded users are never created in production regardless. Use `ADMIN_EMAILS`
+ * to bootstrap a real admin: the first sign-in by a listed address is promoted.
+ */
+function demoSeedAllowed() {
+  if (process.env.SEED_DEMO_DATA === "true") return true;
+  return process.env.NODE_ENV !== "production";
+}
+
 function indexBySlug<T extends { slug: string }>(items: Array<T & { _id: unknown }>) {
   return items.reduce<Record<string, string>>((accumulator, item) => {
     accumulator[item.slug] = String(item._id);
@@ -23,7 +42,7 @@ function indexBySlug<T extends { slug: string }>(items: Array<T & { _id: unknown
 }
 
 export async function ensureSeedData() {
-  if (!isDatabaseConfigured()) {
+  if (!isDatabaseConfigured() || !demoSeedAllowed()) {
     return false;
   }
 
@@ -74,19 +93,19 @@ export async function ensureSeedData() {
           String(product._id),
         ]),
       );
-      const hashedAdmin = await hashPassword("Admin@12345!");
-      const hashedCustomer = await hashPassword("Customer@12345!");
-
-      await User.insertMany([
-        {
-          ...demoUsers[0],
-          passwordHash: hashedAdmin,
-        },
-        {
-          ...demoUsers[1],
-          passwordHash: hashedCustomer,
-        },
-      ]);
+      // Demo accounts use credentials published in this repository, so they are
+      // created for local development only — never in production, even when demo
+      // seeding has been explicitly enabled there for the catalogue.
+      if (process.env.NODE_ENV !== "production") {
+        await User.insertMany(
+          await Promise.all(
+            demoUsers.map(async ({ password, ...user }) => ({
+              ...user,
+              passwordHash: await hashPassword(password),
+            })),
+          ),
+        );
+      }
 
       await Order.insertMany(
         demoOrders.map((order) => ({

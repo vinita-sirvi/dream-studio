@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
 
+import { requireAdmin } from "@/lib/api-auth";
 import { env } from "@/lib/env";
 import { errorResponse, successResponse } from "@/lib/http";
+import { enforceRateLimit } from "@/lib/rate-limit";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +11,42 @@ function getCloudinaryCloudName() {
   return env.CLOUDINARY_CLOUD_NAME ?? env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
 }
 
+/**
+ * Media types this endpoint will forward.
+ *
+ * Cloudinary is called on the `auto` resource type, which happily accepts
+ * arbitrary files — including HTML and SVG, which are script-bearing and would be
+ * served from the CDN domain. Only raster images and video are allowed through.
+ */
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
+
+const MAX_UPLOAD_BYTES = 20 * 1024 * 1024;
+
+/**
+ * Upload product media to Cloudinary.
+ *
+ * This endpoint had no authorization at all. Since it forwards to Cloudinary using
+ * this account's own credentials, anyone on the internet could store files there —
+ * running up the bill, filling the media library, and hosting content of their
+ * choosing on the project's CDN domain. It is admin-only now, rate limited, and
+ * restricted to image and video types.
+ */
 export async function POST(request: NextRequest) {
+  const auth = await requireAdmin();
+  if (!auth.ok) return auth.response;
+
+  const limited = await enforceRateLimit("upload", auth.session.user.id);
+  if (limited) return limited;
+
   const formData = await request.formData().catch(() => null);
   if (!formData) {
     return errorResponse("Invalid upload payload.", 400);
@@ -24,8 +61,15 @@ export async function POST(request: NextRequest) {
     return errorResponse("Empty upload file.", 400);
   }
 
-  if (file.size > 20 * 1024 * 1024) {
+  if (file.size > MAX_UPLOAD_BYTES) {
     return errorResponse("File is too large. Please upload a file smaller than 20 MB.", 413);
+  }
+
+  if (!ALLOWED_MIME_TYPES.has(file.type)) {
+    return errorResponse(
+      "Only JPEG, PNG, WebP, AVIF, GIF images and MP4, WebM or MOV video can be uploaded.",
+      415,
+    );
   }
 
   const cloudName = getCloudinaryCloudName();
@@ -37,7 +81,14 @@ export async function POST(request: NextRequest) {
   const payload = new FormData();
   payload.append("file", file);
 
-  const folder = String(formData.get("folder") ?? "").trim();
+  // Constrain the folder to a simple path so it cannot traverse into unrelated
+  // parts of the Cloudinary account.
+  const folder = String(formData.get("folder") ?? "")
+    .trim()
+    .replace(/[^a-zA-Z0-9/_-]/g, "")
+    .replace(/\.{2,}/g, "")
+    .replace(/^\/+|\/+$/g, "");
+
   if (folder) {
     payload.append("folder", folder);
   }

@@ -1,24 +1,36 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { howToMeasure } from "@/data/size-guide";
 import {
   AccountCard,
-  AccountEmpty,
   AccountHeader,
 } from "@/components/site/account/account-panel";
+import {
+  MeasurementManager,
+  type MeasurementProfile,
+} from "@/components/site/account/measurement-manager";
 import { ButtonLink } from "@/components/ui/button";
+import { serialize } from "@/lib/http";
+import { Measurement } from "@/lib/models";
+import { isDatabaseConfigured, tryConnectToDatabase } from "@/lib/mongodb";
+import { getCurrentSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Saved Measurements" };
 
 /**
  * Saved measurement profiles.
  *
- * A Measurement model exists in lib/models.ts, but there is no route to read or
- * write profiles for the signed-in user, so this shows the empty state plus the
- * reference list of what we record. The public /size-guide page carries the full
- * how-to-measure walkthrough.
+ * Reads and writes through `/api/measurements`. The reference list of what the
+ * studio records stays below the editor, and the full walkthrough lives on the
+ * public /size-guide page.
  */
-export default function SavedMeasurementsPage() {
+export default async function SavedMeasurementsPage() {
+  const session = await getCurrentSession();
+  if (!session) redirect("/login?next=/saved-measurements");
+
+  const profiles = await loadProfiles(session.user.id);
+
   return (
     <>
       <AccountHeader
@@ -28,15 +40,9 @@ export default function SavedMeasurementsPage() {
         action={{ label: "Full size guide", href: "/size-guide" }}
       />
 
-      <AccountEmpty
-        icon="tape"
-        title="No profiles saved yet"
-        description="Measurements are recorded during your first fitting, in the studio or over a guided video call, and kept here afterwards."
-        primaryCta={{ label: "Book a fitting call", href: "/contact" }}
-        secondaryCta={{ label: "Read the size guide", href: "/size-guide" }}
-      />
+      <MeasurementManager profiles={profiles} />
 
-      <div className="mt-6">
+      <div className="mt-8">
         <AccountCard
           title="What we record"
           footer={
@@ -62,4 +68,15 @@ export default function SavedMeasurementsPage() {
       </div>
     </>
   );
+}
+
+async function loadProfiles(userId: string): Promise<MeasurementProfile[]> {
+  if (!isDatabaseConfigured()) return [];
+
+  const connected = await tryConnectToDatabase();
+  if (!connected) return [];
+
+  return serialize(
+    await Measurement.find({ userId }).sort({ createdAt: -1 }).lean(),
+  ) as MeasurementProfile[];
 }

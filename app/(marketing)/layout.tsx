@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site/footer";
 import { SiteHeader } from "@/components/site/header";
 import { CursorFollower } from "@/components/motion/cursor-follower";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
+import { WishlistProvider } from "@/components/site/wishlist/wishlist-provider";
 
 const BASE = process.env.APP_URL ?? "http://localhost:3000";
 
@@ -56,13 +57,16 @@ export default function MarketingLayout({
       <SmoothScroll />
       <CursorFollower />
 
-      <SiteHeader />
-      {/* `main` is the skip-link target; flex-1 keeps the footer at the bottom
-          on short pages. */}
-      <main id="main" className="flex-1">
-        {children}
-      </main>
-      <SiteFooter />
+      {/* Shares one wishlist read across every product card on the page. */}
+      <WishlistProvider>
+        <SiteHeader />
+        {/* `main` is the skip-link target; flex-1 keeps the footer at the bottom
+            on short pages. */}
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
+      </WishlistProvider>
     </>
   );
 }

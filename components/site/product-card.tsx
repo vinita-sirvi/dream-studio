@@ -8,11 +8,14 @@ import { cn } from "@/lib/cn";
 import { formatRupees, orderedImages, type ProductImage } from "@/lib/product";
 
 import { Icon } from "./icons";
+import { useWishlistItem } from "./wishlist/wishlist-provider";
 
 // Re-exported for convenience so existing client-side imports keep working.
 export { formatRupees, orderedImages };
 
 export type ProductCardProduct = {
+  /** Database id. Absent for demo-catalogue entries, which cannot be persisted. */
+  id?: string;
   name: string;
   slug: string;
   shortDescription?: string;
@@ -28,10 +31,10 @@ export type ProductCardProduct = {
 /**
  * Product card.
  *
- * Client component only because of the local wishlist toggle and hover image
- * swap. The wishlist state is deliberately local and unpersisted — there is no
- * wishlist API in this codebase, and inventing one is outside this redesign's
- * scope. It is presentational until a backend exists.
+ * The wishlist heart now persists through `/api/wishlist`, shared across the grid
+ * by `<WishlistProvider>` so the page makes one request rather than one per card.
+ * Where no provider or product id is available it degrades to a local toggle, so
+ * the control is never simply inert.
  */
 export function ProductCard({
   product,
@@ -47,7 +50,18 @@ export function ProductCard({
   onQuickView?: (product: ProductCardProduct) => void;
   className?: string;
 }) {
-  const [wished, setWished] = useState(false);
+  const wishlist = useWishlistItem(product.id);
+  const [localWished, setLocalWished] = useState(false);
+  const wished = wishlist.supported ? wishlist.saved : localWished;
+
+  function toggleWishlist() {
+    if (wishlist.supported) {
+      void wishlist.toggle();
+      return;
+    }
+    setLocalWished((value) => !value);
+  }
+
   const images = orderedImages(product.images);
   const primary = images[0];
   const secondary = images[1];
@@ -119,7 +133,7 @@ export function ProductCard({
         {/* Wishlist */}
         <button
           type="button"
-          onClick={() => setWished((value) => !value)}
+          onClick={toggleWishlist}
           aria-pressed={wished}
           aria-label={
             wished

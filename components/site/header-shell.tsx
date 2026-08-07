@@ -30,10 +30,13 @@ export function HeaderShell({
   announcement,
   /** True on routes whose hero sits beneath the header. */
   overHero,
+  /** Units in the bag, resolved on the server. */
+  cartCount = 0,
 }: {
   user: SessionUser;
   announcement: string;
   overHero: boolean;
+  cartCount?: number;
 }) {
   const pathname = usePathname();
   // 24px of travel is enough to feel intentional without flickering.
@@ -154,10 +157,27 @@ export function HeaderShell({
 
             <Link
               href="/cart"
-              aria-label="Cart"
-              className={iconActionClasses(inverted)}
+              aria-label={
+                cartCount > 0
+                  ? `Cart, ${cartCount} ${cartCount === 1 ? "item" : "items"}`
+                  : "Cart"
+              }
+              className={cn(iconActionClasses(inverted), "relative")}
             >
               <Icon name="bag" className="h-[18px] w-[18px]" />
+              {cartCount > 0 ? (
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[10px] font-medium tabular-nums",
+                    inverted
+                      ? "bg-on-dark text-espresso"
+                      : "bg-espresso text-on-dark",
+                  )}
+                >
+                  {cartCount > 99 ? "99+" : cartCount}
+                </span>
+              ) : null}
             </Link>
 
             {/* Account menu (includes sign-out) or a sign-in link */}

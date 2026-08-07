@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { cn } from "@/lib/cn";
 import { ButtonLink } from "@/components/ui/button";
+import { AddToCart } from "@/components/site/cart/add-to-cart";
 
 import { Icon } from "../icons";
 import { SizeGuideDrawer } from "./size-guide-drawer";
@@ -13,16 +14,24 @@ const SIZES = ["XS", "S", "M", "L", "XL", "2XL"] as const;
 /**
  * Purchase controls: size selection, made-to-measure toggle, and CTAs.
  *
- * IMPORTANT: there is no cart API in this codebase, so this does not add to a
- * cart. The primary action routes to /custom-order, carrying the product and any
- * chosen size as query parameters — a real, working path to purchase that uses
- * the custom-order flow which does exist. Nothing here fakes a transaction.
+ * Two genuine routes to buy, chosen by the fit selection:
+ *
+ *  - Standard size adds to the cart (`/api/cart`), which prices the line
+ *    server-side and checks stock.
+ *  - Made to measure goes to the commission flow, since it needs measurements and
+ *    a tailor's quotation before an amount exists.
+ *
+ * A standard-size selection is required before adding, so the order records which
+ * size to cut — silently defaulting one would be worse than asking.
  */
 export function PurchasePanel({
+  productId,
   productName,
   productSlug,
   inStock,
 }: {
+  /** Absent for demo-catalogue products, which have no database id to add. */
+  productId?: string;
   productName: string;
   productSlug: string;
   inStock: boolean;
@@ -129,15 +138,36 @@ export function PurchasePanel({
 
       {/* Actions */}
       <div className="mt-8 grid gap-3">
-        <ButtonLink href={commissionHref} size="lg" className="w-full">
-          {madeToMeasure ? "Order to my measurements" : "Enquire & order"}
-          <Icon name="arrow-right" className="h-4 w-4" />
-        </ButtonLink>
+        {madeToMeasure || !productId ? (
+          <ButtonLink href={commissionHref} size="lg" className="w-full">
+            {madeToMeasure ? "Order to my measurements" : "Enquire & order"}
+            <Icon name="arrow-right" className="h-4 w-4" />
+          </ButtonLink>
+        ) : (
+          <AddToCart
+            productId={productId}
+            variant={size ? { size } : {}}
+            disabled={!inStock || !size}
+            disabledLabel={!inStock ? "Sold out" : "Choose a size"}
+          />
+        )}
+
+        {!madeToMeasure && productId ? (
+          <ButtonLink
+            href={commissionHref}
+            variant="secondary"
+            size="lg"
+            className="w-full"
+          >
+            Or commission it made to measure
+          </ButtonLink>
+        ) : null}
+
         <ButtonLink
           href={`/contact?subject=${encodeURIComponent(
             `Question about ${productName}`,
           )}`}
-          variant="secondary"
+          variant="ghost"
           size="lg"
           className="w-full"
         >

@@ -40,24 +40,49 @@ export const customOrderSchema = z.object({
   specialInstructions: z.string().optional(),
 });
 
+/**
+ * Registration.
+ *
+ * The 8-character floor was the only rule; a password of "password" passed. The
+ * added checks are the usual composition rules, plus a cap because scrypt hashes
+ * whatever it is given and an unbounded password is a cheap way to burn CPU.
+ */
 export const authRegisterSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
-  password: z.string().min(8),
+  name: z.string().min(2).max(80).trim(),
+  email: z.string().email().max(160),
+  password: z
+    .string()
+    .min(8, { error: "Use at least 8 characters." })
+    .max(200, { error: "Passwords cannot be longer than 200 characters." })
+    .regex(/[a-zA-Z]/, { error: "Include at least one letter." })
+    .regex(/[0-9]/, { error: "Include at least one number." }),
 });
 
 export const authLoginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email().max(160),
+  password: z.string().min(1).max(200),
 });
 
 export const otpRequestSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().max(160),
 });
 
 export const otpVerifySchema = z.object({
-  email: z.string().email(),
-  code: z.string().length(6),
+  email: z.string().email().max(160),
+  code: z.string().regex(/^\d{6}$/, { error: "Enter the six-digit code." }),
+});
+
+/**
+ * Admin-managed user record. Deliberately has no `password` field: passwords are
+ * only ever set through the auth routes, which hash them. An admin can change
+ * someone's role here, which is why the route requires an admin session.
+ */
+export const adminUserSchema = z.object({
+  name: z.string().min(2).max(80),
+  email: z.string().email().max(160),
+  role: z.enum(["customer", "admin", "super_admin"]).default("customer"),
+  phone: z.string().max(32).optional(),
+  avatar: z.string().optional(),
 });
 
 export const productSchema = z.object({
@@ -231,7 +256,99 @@ export const couponSchema = z.object({
   active: z.boolean().default(true),
 });
 
-export const orderSchema = z.object({
+const objectId = z
+  .string()
+  .regex(/^[a-f\d]{24}$/i, { error: "Not a valid identifier." });
+
+export const orderStatuses = [
+  "pending",
+  "confirmed",
+  "processing",
+  "stitching",
+  "packed",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded",
+  "returned",
+] as const;
+
+const addressFields = {
+  name: z.string().min(2).max(80),
+  line1: z.string().min(4).max(160),
+  line2: z.string().max(160).optional().or(z.literal("")),
+  city: z.string().min(2).max(80),
+  state: z.string().min(2).max(80),
+  country: z.string().min(2).max(80).default("India"),
+  postalCode: z.string().min(4).max(12),
+  phone: z.string().min(6).max(32),
+};
+
+export const checkoutAddressSchema = z.object(addressFields);
+
+/**
+ * Customer checkout.
+ *
+ * Note what is absent: `price`, `totals`, and `status`. The previous public
+ * order route accepted all three from the request body, so anyone could post an
+ * order for a ₹80,000 lehenga with `grandTotal: 1` and it would be stored and
+ * shown to staff as the real amount. Items here are references — a product id
+ * and a quantity — and every figure is recomputed server-side in
+ * `lib/checkout.ts` from the catalogue.
+ */
+export const checkoutSchema = z.object({
+  customerName: z.string().min(2).max(80),
+  email: z.string().email().max(160),
+  phone: z.string().min(6).max(32),
+  notes: z.string().max(1000).optional(),
+  shippingMethod: z.enum(["standard", "express"]).default("standard"),
+  paymentMethod: z.enum(["cod", "bank-transfer", "pay-on-quotation"]),
+  couponCode: z.string().max(40).optional(),
+  giftWrap: z.boolean().default(false),
+  termsAccepted: z.literal(true, {
+    error: "Please accept the terms to place your order.",
+  }),
+  shippingAddress: checkoutAddressSchema,
+  /** When absent, the shipping address is reused for billing. */
+  billingAddress: checkoutAddressSchema.optional(),
+});
+
+export const trackOrderSchema = z.object({
+  orderId: z.string().min(4).max(40),
+  email: z.string().email().max(160),
+});
+
+export const couponValidateSchema = z.object({
+  code: z.string().min(2).max(40),
+});
+
+/** Add-to-cart. Quantity is capped so one request cannot reserve the stock room. */
+export const cartAddSchema = z.object({
+  productId: objectId,
+  quantity: z.number().int().min(1).max(20).default(1),
+  variant: z.record(z.string(), z.string()).default({}),
+  customization: z.record(z.string(), z.string()).default({}),
+});
+
+export const cartUpdateSchema = z.object({
+  lineId: z.string().min(1).max(200),
+  /** Zero removes the line. */
+  quantity: z.number().int().min(0).max(20),
+});
+
+export const cartRemoveSchema = z.object({
+  lineId: z.string().min(1).max(200),
+});
+
+export const wishlistToggleSchema = z.object({
+  productId: objectId,
+});
+
+/**
+ * Admin-entered order. Admins are trusted to set status and are the only callers
+ * who may, which is why this is separate from `checkoutSchema`.
+ */
+export const adminOrderSchema = z.object({
   customerName: z.string().min(2),
   email: z.string().email(),
   phone: z.string().min(6),

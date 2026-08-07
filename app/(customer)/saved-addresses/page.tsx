@@ -1,20 +1,30 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import {
-  AccountEmpty,
-  AccountHeader,
-} from "@/components/site/account/account-panel";
+  AddressManager,
+  type SavedAddress,
+} from "@/components/site/account/address-manager";
+import { AccountHeader } from "@/components/site/account/account-panel";
+import { serialize } from "@/lib/http";
+import { Address } from "@/lib/models";
+import { isDatabaseConfigured, tryConnectToDatabase } from "@/lib/mongodb";
+import { getCurrentSession } from "@/lib/session";
 
 export const metadata: Metadata = { title: "Saved Addresses" };
 
 /**
  * Saved addresses.
  *
- * An Address model exists in lib/models.ts, but there is no route to read or
- * write addresses for the signed-in user, so this presents its empty state
- * honestly rather than a form that cannot persist.
+ * Reads and writes through `/api/addresses`. The `Address` model existed but had no
+ * customer-facing route, so this page could only ever show an empty state.
  */
-export default function SavedAddressesPage() {
+export default async function SavedAddressesPage() {
+  const session = await getCurrentSession();
+  if (!session) redirect("/login?next=/saved-addresses");
+
+  const addresses = await loadAddresses(session.user.id);
+
   return (
     <>
       <AccountHeader
@@ -23,13 +33,20 @@ export default function SavedAddressesPage() {
         description="Keep addresses on file so checkout and dispatch do not need re-typing."
       />
 
-      <AccountEmpty
-        icon="pin"
-        title="No addresses saved"
-        description="Add an address when you place your next order and we will keep it here for future deliveries."
-        primaryCta={{ label: "Browse the catalogue", href: "/shop" }}
-        secondaryCta={{ label: "Contact the studio", href: "/contact" }}
-      />
+      <AddressManager addresses={addresses} />
     </>
   );
+}
+
+async function loadAddresses(userId: string): Promise<SavedAddress[]> {
+  if (!isDatabaseConfigured()) return [];
+
+  const connected = await tryConnectToDatabase();
+  if (!connected) return [];
+
+  return serialize(
+    await Address.find({ userId })
+      .sort({ defaultShipping: -1, createdAt: -1 })
+      .lean(),
+  ) as SavedAddress[];
 }

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
-import { EmptyState } from "@/components/site/empty-state";
+import { getOwnerScope } from "@/lib/api-auth";
 import { PageHero } from "@/components/site/page-hero";
+import { WishlistView } from "@/components/site/wishlist/wishlist-view";
+import { readWishlist } from "@/lib/wishlist";
 
 export const metadata: Metadata = {
   title: "Wishlist",
@@ -11,27 +13,23 @@ export const metadata: Metadata = {
 /**
  * Wishlist.
  *
- * The heart control on product cards is local, unpersisted UI — there is no
- * wishlist API in this codebase, so saved items cannot survive a reload. This
- * page states that plainly instead of appearing broken.
+ * Persisted in the `Wishlist` collection against the signed-in user, or the signed
+ * guest cookie while browsing anonymously — and merged into the account at
+ * sign-in, so a shortlist built before registering is not lost.
  */
-export default function WishlistPage() {
+export default async function WishlistPage() {
+  const scope = await getOwnerScope();
+  const items = await readWishlist(scope);
+
   return (
     <>
       <PageHero
         eyebrow="Wishlist"
         title="Your saved pieces"
-        description="Keep a running list of what you are considering, and share it with us when you are ready to order."
+        description="Keep a running list of what you are considering, and move anything to your bag when you are ready."
         crumbs={[{ label: "Wishlist" }]}
       />
-      <EmptyState
-        icon="heart"
-        title="No saved pieces yet"
-        description="Tap the heart on any piece to shortlist it while you browse."
-        primaryCta={{ label: "Browse the catalogue", href: "/shop" }}
-        secondaryCta={{ label: "View collections", href: "/collections" }}
-        note="Saving is not yet synced to your account, so a shortlist will not survive a page reload. Sign in and it will once accounts support it."
-      />
+      <WishlistView items={items} />
     </>
   );
 }

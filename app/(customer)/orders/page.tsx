@@ -1,20 +1,30 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
-import {
-  AccountEmpty,
-  AccountHeader,
-} from "@/components/site/account/account-panel";
+import { AccountHeader } from "@/components/site/account/account-panel";
+import { OrderHistory } from "@/components/site/account/order-history";
+import { getCurrentSession } from "@/lib/session";
+import { getOrdersForUser } from "@/lib/storefront";
 
 export const metadata: Metadata = { title: "My Orders" };
 
 /**
  * Order history.
  *
- * There is no per-user order query in lib/storefront.ts — orders are only read in
- * aggregate for the admin dashboard — so this shows a real empty state instead of
- * placeholder rows. Wiring it up needs a `getOrdersForUser(userId)` helper.
+ * Backed by `getOrdersForUser()`, which this page previously had no equivalent of.
+ * The session is verified here rather than relying only on the group layout:
+ * layouts do not re-render on every navigation, so a check there alone is not a
+ * dependable guard for the data a page reads.
  */
-export default function OrdersPage() {
+export default async function OrdersPage() {
+  const session = await getCurrentSession();
+  if (!session) redirect("/login?next=/orders");
+
+  const orders = await getOrdersForUser({
+    userId: session.user.id,
+    email: session.user.email,
+  });
+
   return (
     <>
       <AccountHeader
@@ -24,13 +34,7 @@ export default function OrdersPage() {
         action={{ label: "Track a parcel", href: "/track-order" }}
       />
 
-      <AccountEmpty
-        icon="box"
-        title="No orders yet"
-        description="Once you place an order it will appear here, with its stage from cutting through to dispatch."
-        primaryCta={{ label: "Browse the catalogue", href: "/shop" }}
-        secondaryCta={{ label: "Commission a piece", href: "/custom-order" }}
-      />
+      <OrderHistory orders={orders} />
     </>
   );
 }

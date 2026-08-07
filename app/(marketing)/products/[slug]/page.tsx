@@ -186,6 +186,10 @@ export default async function ProductDetailsPage({
             ) : null}
 
             <PurchasePanel
+              // Demo-catalogue products use their slug as an id, so there is no
+              // database row to add to a cart. Passing the id only when it is a
+              // real ObjectId keeps the commission flow as the offered path there.
+              productId={/^[a-f\d]{24}$/i.test(product.id) ? product.id : undefined}
               productName={product.name}
               productSlug={product.slug}
               inStock={inStock}
