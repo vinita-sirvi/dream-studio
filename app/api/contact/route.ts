@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import type { DbDoc, DbInput } from "@/lib/db-types";
 
 import { escapeEmailHtml, sendEmailQuietly } from "@/lib/email";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { SupportTicket } from "@/lib/models";
 import { contactSchema } from "@/lib/validators";
@@ -34,13 +35,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const ticket = await SupportTicket.create({
     ...parsed.data,
     ticketId: generateReference("TKT"),
     source: "contact-form",
-  } as any);
+  } as DbInput);
 
   const adminTargets = getAdminEmails();
   const to =
@@ -67,5 +69,5 @@ export async function POST(request: NextRequest) {
   // Only the reference is returned. Echoing the whole stored document served no
   // purpose for the form and meant any future internal field on the model would
   // start leaking to the browser by default.
-  return successResponse({ ticketId: (ticket as any).ticketId }, 201);
+  return successResponse({ ticketId: (ticket as DbDoc).ticketId }, 201);
 }

@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import type { DbDoc } from "@/lib/db-types";
 
 import { mergeGuestCartIntoUser } from "@/lib/cart";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { User } from "@/lib/models";
 import { authLoginSchema } from "@/lib/validators";
@@ -30,9 +31,10 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit("login", email);
   if (limited) return limited;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
-  const user = (await User.findOne({ email })) as any;
+  const user = (await User.findOne({ email })) as DbDoc;
   if (!user?.passwordHash) {
     return errorResponse("Invalid email or password.", 401);
   }

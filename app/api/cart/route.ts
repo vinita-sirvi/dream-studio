@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import type { DbDoc } from "@/lib/db-types";
 
 import { getOwnerScope } from "@/lib/api-auth";
 import {
@@ -11,6 +12,7 @@ import {
   setCartLineQuantity,
 } from "@/lib/cart";
 import { errorResponse, successResponse } from "@/lib/http";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import {
   cartAddSchema,
@@ -30,6 +32,9 @@ export const dynamic = "force-dynamic";
  * client never has to compute money itself.
  */
 export async function GET() {
+  const offline = await ensureDatabase();
+  if (offline) return offline;
+
   const scope = await getOwnerScope();
   return successResponse(await readCart(scope));
 }
@@ -49,6 +54,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const offline = await ensureDatabase();
+  if (offline) return offline;
+
   const scope = await getOwnerScope();
   const result = await addToCart(scope, parsed.data);
 
@@ -64,10 +72,13 @@ export async function PATCH(request: NextRequest) {
   const limited = await enforceRateLimit("mutation");
   if (limited) return limited;
 
-  const payload: any = await request.json().catch(() => null);
+  const payload: DbDoc = await request.json().catch(() => null);
   if (!payload || typeof payload !== "object") {
     return errorResponse("Invalid request body.", 400);
   }
+
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const scope = await getOwnerScope();
 
@@ -102,6 +113,9 @@ export async function PATCH(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   const limited = await enforceRateLimit("mutation");
   if (limited) return limited;
+
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const scope = await getOwnerScope();
   const { searchParams } = new URL(request.url);

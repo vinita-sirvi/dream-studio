@@ -1,4 +1,5 @@
 import "server-only";
+import type { DbDoc } from "./db-types";
 
 import { Coupon, Product, Setting } from "./models";
 
@@ -88,7 +89,7 @@ export function lineIdFor(
 }
 
 /** The price a single unit sells for, honouring variant overrides and offers. */
-function unitPriceOf(product: any, variant: Record<string, string>) {
+function unitPriceOf(product: DbDoc, variant: Record<string, string>) {
   const matched = matchVariant(product, variant);
   if (matched && typeof matched.customPrice === "number" && matched.customPrice > 0) {
     return round2(matched.customPrice);
@@ -105,7 +106,7 @@ function unitPriceOf(product: any, variant: Record<string, string>) {
 }
 
 /** Offer windows are stored as date strings; an absent bound means open-ended. */
-function isOfferLive(pricing: any) {
+function isOfferLive(pricing: DbDoc) {
   const now = Date.now();
   const start = pricing.offerStart ? Date.parse(pricing.offerStart) : null;
   const end = pricing.offerEnd ? Date.parse(pricing.offerEnd) : null;
@@ -116,8 +117,8 @@ function isOfferLive(pricing: any) {
 }
 
 /** Index of the variant matching the chosen options, or -1. */
-function matchVariantIndex(product: any, variant: Record<string, string>) {
-  const variants: any[] = product.variants ?? [];
+function matchVariantIndex(product: DbDoc, variant: Record<string, string>) {
+  const variants: DbDoc[] = product.variants ?? [];
   if (!variants.length) return -1;
 
   const keys = Object.keys(variant).filter((key) => variant[key]);
@@ -132,7 +133,7 @@ function matchVariantIndex(product: any, variant: Record<string, string>) {
   );
 }
 
-function matchVariant(product: any, variant: Record<string, string>) {
+function matchVariant(product: DbDoc, variant: Record<string, string>) {
   const index = matchVariantIndex(product, variant);
   return index === -1 ? null : product.variants[index];
 }
@@ -144,7 +145,7 @@ function matchVariant(product: any, variant: Record<string, string>) {
  * authoritative, otherwise checkout can reserve product-level stock for a line
  * whose variant is already sold out.
  */
-function resolveStock(product: any, variant: Record<string, string>) {
+function resolveStock(product: DbDoc, variant: Record<string, string>) {
   const inventory = product.inventory ?? {};
   if (inventory.unlimitedStock || inventory.trackInventory === false) {
     return { available: null as number | null, path: null as string | null };
@@ -164,8 +165,8 @@ function resolveStock(product: any, variant: Record<string, string>) {
   };
 }
 
-function primaryImage(product: any) {
-  const images: any[] = product.images ?? [];
+function primaryImage(product: DbDoc) {
+  const images: DbDoc[] = product.images ?? [];
   const preferred =
     images.find((image) => image?.isPrimary && image?.url) ??
     images.find((image) => image?.url);
@@ -192,7 +193,7 @@ export async function priceCartLines(inputs: CartLineInput[]): Promise<{
 
   const ids = [...new Set(inputs.map((input) => input.productId))];
   const products = await Product.find({ _id: { $in: ids } }).lean();
-  const byId = new Map(products.map((product: any) => [String(product._id), product]));
+  const byId = new Map(products.map((product: DbDoc) => [String(product._id), product]));
 
   const lines: PricedLine[] = [];
 
@@ -286,7 +287,7 @@ const DEFAULT_SETTINGS: StoreSettings = {
 
 /** Shipping and payment configuration, from the Setting document if present. */
 export async function getStoreSettings(): Promise<StoreSettings> {
-  const setting: any = await Setting.findOne({}).lean();
+  const setting: DbDoc = await Setting.findOne({}).lean();
   if (!setting) return DEFAULT_SETTINGS;
 
   return {
@@ -334,7 +335,7 @@ export async function resolveCoupon(
     return { ok: false, message: "Enter a code." };
   }
 
-  const coupon: any = await Coupon.findOne({
+  const coupon: DbDoc = await Coupon.findOne({
     code: normalized,
     active: true,
   }).lean();

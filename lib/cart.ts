@@ -1,4 +1,5 @@
 import "server-only";
+import type { DbDoc } from "./db-types";
 
 import type { OwnerScope } from "./api-auth";
 import { Cart } from "./models";
@@ -48,10 +49,10 @@ async function getOrCreateCart(scope: OwnerScope) {
   return Cart.create({ ...filter, items: [] });
 }
 
-function toLineInputs(cart: any): CartLineInput[] {
+function toLineInputs(cart: DbDoc): CartLineInput[] {
   return (cart?.items ?? [])
-    .filter((item: any) => item?.productId)
-    .map((item: any) => ({
+    .filter((item: DbDoc) => item?.productId)
+    .map((item: DbDoc) => ({
       productId: String(item.productId),
       quantity: item.quantity ?? 1,
       variant: plainObject(item.variant),
@@ -146,10 +147,10 @@ export async function readCart(scope: OwnerScope): Promise<CartView> {
 /** Number of units in the cart, for the header badge. */
 export async function readCartCount(scope: OwnerScope) {
   await connectToDatabase();
-  const cart: any = await Cart.findOne(scopeFilter(scope)).lean();
+  const cart: DbDoc = await Cart.findOne(scopeFilter(scope)).lean();
   if (!cart?.items?.length) return 0;
   return cart.items.reduce(
-    (sum: number, item: any) => sum + (item.quantity ?? 0),
+    (sum: number, item: DbDoc) => sum + (item.quantity ?? 0),
     0,
   );
 }
@@ -175,7 +176,7 @@ export async function addToCart(
   const targetId = lineIdFor(input.productId, priced.variant, priced.customization);
 
   const existing = (cart.items ?? []).find(
-    (item: any) =>
+    (item: DbDoc) =>
       lineIdFor(
         String(item.productId),
         plainObject(item.variant),
@@ -217,7 +218,7 @@ export async function setCartLineQuantity(
 
   if (quantity <= 0) {
     cart.items = (cart.items ?? []).filter(
-      (item: any) =>
+      (item: DbDoc) =>
         lineIdFor(
           String(item.productId),
           plainObject(item.variant),
@@ -226,7 +227,7 @@ export async function setCartLineQuantity(
     );
   } else {
     const target = (cart.items ?? []).find(
-      (item: any) =>
+      (item: DbDoc) =>
         lineIdFor(
           String(item.productId),
           plainObject(item.variant),
@@ -314,7 +315,7 @@ export async function mergeGuestCartIntoUser(
     );
 
     const existing = (userCart.items ?? []).find(
-      (candidate: any) =>
+      (candidate: DbDoc) =>
         lineIdFor(
           String(candidate.productId),
           plainObject(candidate.variant),

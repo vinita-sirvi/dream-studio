@@ -1,4 +1,5 @@
 import "server-only";
+import type { DbDoc, DbInput } from "./db-types";
 
 import { randomInt } from "node:crypto";
 
@@ -49,6 +50,15 @@ export function generateOrderId(now = new Date()) {
   }
 
   return `DD-${date}-${suffix}`;
+}
+
+/** True for Mongo's duplicate-key error, whatever wrapper it arrives in. */
+function isDuplicateKeyError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    (error as { code?: unknown }).code === 11000
+  );
 }
 
 type Reservation = { productId: string; path: string; quantity: number };
@@ -179,7 +189,7 @@ export async function placeOrder({
   try {
     // Retry only on a duplicate order id, which the random suffix makes
     // vanishingly unlikely but not impossible.
-    let created: any = null;
+    let created: DbDoc = null;
     for (let attempt = 0; attempt < 4 && !created; attempt += 1) {
       const orderId = generateOrderId(now);
       try {
@@ -215,9 +225,11 @@ export async function placeOrder({
               at: now.toISOString(),
             },
           ],
-        } as any);
-      } catch (error: any) {
-        if (error?.code !== 11000) throw error;
+        } as DbInput);
+      } catch (error) {
+        // 11000 is Mongo's duplicate-key code. Anything else is a real failure
+        // and must not be swallowed by the retry loop.
+        if (!isDuplicateKeyError(error)) throw error;
       }
     }
 
@@ -244,7 +256,7 @@ export async function placeOrder({
         title: `Order ${created.orderId} received`,
         message: `We have your order and will confirm fabric and fit shortly.`,
         metadata: { orderId: created.orderId },
-      } as any).catch((error) =>
+      } as DbInput).catch((error) =>
         console.error("[checkout] notification insert failed", error),
       );
     }

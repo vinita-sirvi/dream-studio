@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
+import type { DbDoc } from "@/lib/db-types";
 
 import { mergeGuestCartIntoUser } from "@/lib/cart";
 import { getAdminEmails } from "@/lib/env";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { User } from "@/lib/models";
 import { verifyOtpCode } from "@/lib/password";
@@ -44,9 +45,10 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit("otpVerify", email);
   if (limited) return limited;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
-  const user = (await User.findOne({ email })) as any;
+  const user = (await User.findOne({ email })) as DbDoc;
 
   // One message for every failure mode below, so the response cannot be used to
   // learn whether an address has an account or a code outstanding.

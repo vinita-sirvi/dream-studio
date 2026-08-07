@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 
 import { getOwnerScope } from "@/lib/api-auth";
 import { errorResponse, successResponse } from "@/lib/http";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { wishlistToggleSchema } from "@/lib/validators";
 import { readWishlist, readWishlistIds, toggleWishlist } from "@/lib/wishlist";
@@ -10,6 +11,9 @@ export const dynamic = "force-dynamic";
 
 /** `?ids=1` returns just the saved ids, for setting the heart state on a grid. */
 export async function GET(request: NextRequest) {
+  const offline = await ensureDatabase();
+  if (offline) return offline;
+
   const scope = await getOwnerScope();
   const { searchParams } = new URL(request.url);
 
@@ -30,6 +34,9 @@ export async function POST(request: NextRequest) {
   if (!parsed.success) {
     return errorResponse("Invalid product.", 400);
   }
+
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const scope = await getOwnerScope();
   const result = await toggleWishlist(scope, parsed.data.productId);

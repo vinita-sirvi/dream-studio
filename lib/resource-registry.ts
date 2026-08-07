@@ -1,6 +1,7 @@
 import type { Model } from "mongoose";
 import { z } from "zod";
 
+import type { DbDoc } from "./db-types";
 import { models, type AppModelName } from "./models";
 import {
   addressSchema,
@@ -103,7 +104,7 @@ export function getResourceModel(resource: string) {
     return null;
   }
 
-  return models[config.modelName] as Model<any>;
+  return models[config.modelName] as Model<DbDoc>;
 }
 
 export function getResourceSchema(resource: string) {

@@ -1,4 +1,5 @@
 import "server-only";
+import type { DbInput } from "./db-types";
 
 import { headers } from "next/headers";
 
@@ -43,7 +44,7 @@ export async function recordAudit({
         headerList.get("x-real-ip") ??
         undefined,
       userAgent: headerList.get("user-agent") ?? undefined,
-    } as any);
+    } as DbInput);
   } catch (error) {
     console.error("[audit] failed to record action", { action, entity, error });
   }

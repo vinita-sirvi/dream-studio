@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
+import type { DbDoc, DbInput } from "@/lib/db-types";
 
 import { mergeGuestCartIntoUser } from "@/lib/cart";
 import { getAdminEmails } from "@/lib/env";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { User } from "@/lib/models";
 import { authRegisterSchema } from "@/lib/validators";
@@ -34,7 +35,8 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit("register", email);
   if (limited) return limited;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const existing = await User.findOne({ email }).select("_id passwordHash").lean();
 
@@ -42,10 +44,10 @@ export async function POST(request: NextRequest) {
     // An account can exist without a password if it was created by requesting an
     // OTP. Registering then sets the password on that same account rather than
     // reporting a conflict the person cannot resolve.
-    if (!(existing as any).passwordHash) {
+    if (!(existing as DbDoc).passwordHash) {
       const passwordHash = await hashPassword(parsed.data.password);
       const updated = (await User.findOneAndUpdate(
-        { _id: (existing as any)._id },
+        { _id: (existing as DbDoc)._id },
         {
           $set: {
             name: parsed.data.name,
@@ -54,7 +56,7 @@ export async function POST(request: NextRequest) {
           },
         },
         { new: true },
-      )) as any;
+      )) as DbDoc;
 
       return finish(updated, 200);
     }
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
     // Email is not actually verified at this point. The OTP flow is what proves
     // ownership of an address, so this only records the account's creation route.
     emailVerifiedAt: undefined,
-  } as any)) as any;
+  } as DbInput)) as DbDoc;
 
   return finish(user, 201);
 }
@@ -88,7 +90,7 @@ function adminRoleFor(email: string) {
   return getAdminEmails().includes(email) ? "admin" : "customer";
 }
 
-async function finish(user: any, status: number) {
+async function finish(user: DbDoc, status: number) {
   const guestId = await getGuestId();
   const userId = String(user._id);
 

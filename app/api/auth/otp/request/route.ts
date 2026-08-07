@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import type { DbDoc, DbInput } from "@/lib/db-types";
 
 import { sendEmailQuietly } from "@/lib/email";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { User } from "@/lib/models";
 import { createOtpCode, hashOtpCode } from "@/lib/password";
@@ -39,7 +40,8 @@ export async function POST(request: NextRequest) {
   const limited = await enforceRateLimit("otpRequest", email);
   if (limited) return limited;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const user = (await User.findOneAndUpdate(
     { email },
@@ -49,9 +51,9 @@ export async function POST(request: NextRequest) {
         name: email.split("@")[0],
         role: "customer",
       },
-    } as any,
+    } as DbInput,
     { upsert: true, new: true },
-  )) as any;
+  )) as DbDoc;
 
   const code = createOtpCode();
   user.otpHash = hashOtpCode(code);

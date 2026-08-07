@@ -1,11 +1,12 @@
 import { NextRequest } from "next/server";
+import type { DbDoc, DbInput } from "@/lib/db-types";
 
 import { requireAdmin } from "@/lib/api-auth";
 import { recordAudit } from "@/lib/audit";
 import { generateOrderId } from "@/lib/checkout";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Order } from "@/lib/models";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { round2 } from "@/lib/pricing";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { adminOrderSchema } from "@/lib/validators";
@@ -29,7 +30,8 @@ export async function GET(request: NextRequest) {
   const auth = await requireAdmin();
   if (!auth.ok) return auth.response;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const { searchParams } = new URL(request.url);
   const rawLimit = Number(searchParams.get("limit"));
@@ -61,7 +63,8 @@ export async function POST(request: NextRequest) {
     return errorResponse("Validation failed.", 400, parsed.error.flatten());
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const data = parsed.data;
 
@@ -82,7 +85,7 @@ export async function POST(request: NextRequest) {
   };
 
   const now = new Date();
-  let created: any = null;
+  let created: DbDoc = null;
 
   for (let attempt = 0; attempt < 4 && !created; attempt += 1) {
     try {
@@ -100,9 +103,17 @@ export async function POST(request: NextRequest) {
                 at: now.toISOString(),
               },
             ],
-      } as any);
-    } catch (error: any) {
-      if (error?.code !== 11000) throw error;
+      } as DbInput);
+    } catch (error) {
+      // 11000 is Mongo's duplicate-key code — retry with a fresh id. Anything
+      // else is a genuine failure and should surface.
+      if (
+        typeof error !== "object" ||
+        error === null ||
+        (error as { code?: unknown }).code !== 11000
+      ) {
+        throw error;
+      }
     }
   }
 

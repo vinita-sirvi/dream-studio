@@ -1,13 +1,14 @@
 import { NextRequest } from "next/server";
 
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Category } from "@/lib/models";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
   const categories = await Category.find({ hidden: { $ne: true } }).sort({
     sortOrder: 1,
     createdAt: -1,
@@ -16,7 +17,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
   const payload = await request.json().catch(() => null);
   if (!payload) {
     return errorResponse("Invalid JSON body.", 400);

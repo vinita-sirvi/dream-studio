@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Product } from "@/lib/models";
 
@@ -10,7 +10,8 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
   const { slug } = await params;
   const product = await Product.findOne({ slug }).populate("categoryId collectionId");
 

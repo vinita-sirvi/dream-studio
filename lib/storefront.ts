@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { isValidObjectId } from "mongoose";
 
+import type { DbDoc } from "./db-types";
 import { serialize } from "./http";
 import {
   isDatabaseConfigured,
@@ -314,22 +315,22 @@ export const getOrdersForUser = cache(
       .limit(50)
       .lean();
 
-    return (orders as any[]).map((order) => ({
+    return (orders as DbDoc[]).map((order) => ({
       id: String(order._id),
       orderId: order.orderId,
       status: order.status ?? "pending",
       placedAt: order.createdAt ? new Date(order.createdAt).toISOString() : null,
       grandTotal: order.totals?.grandTotal ?? 0,
       itemCount: (order.items ?? []).reduce(
-        (sum: number, item: any) => sum + (item.quantity ?? 0),
+        (sum: number, item: DbDoc) => sum + (item.quantity ?? 0),
         0,
       ),
-      items: (order.items ?? []).map((item: any) => ({
+      items: (order.items ?? []).map((item: DbDoc) => ({
         name: item.name ?? "Piece",
         quantity: item.quantity ?? 1,
         price: item.price ?? 0,
       })),
-      timeline: (order.timeline ?? []).map((entry: any) => ({
+      timeline: (order.timeline ?? []).map((entry: DbDoc) => ({
         status: entry.status ?? "",
         note: entry.note ?? null,
         at: entry.at ?? null,

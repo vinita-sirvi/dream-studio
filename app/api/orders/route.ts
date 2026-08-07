@@ -4,7 +4,7 @@ import { getOwnerScope } from "@/lib/api-auth";
 import { placeOrder } from "@/lib/checkout";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Order } from "@/lib/models";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { getCurrentSession } from "@/lib/session";
 import { checkoutSchema } from "@/lib/validators";
@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
     return errorResponse("You need to be signed in to view your orders.", 401);
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const { searchParams } = new URL(request.url);
   const rawLimit = Number(searchParams.get("limit"));

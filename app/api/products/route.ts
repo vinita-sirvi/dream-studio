@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Product } from "@/lib/models";
 import { getCurrentSession, isAdminRole } from "@/lib/session";
@@ -8,7 +8,8 @@ import { getCurrentSession, isAdminRole } from "@/lib/session";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q")?.trim();
@@ -34,7 +35,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
   const session = await getCurrentSession();
   if (!isAdminRole(session?.user.role)) {
     return errorResponse("Unauthorized.", 401);

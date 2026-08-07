@@ -2,8 +2,9 @@ import { isValidObjectId } from "mongoose";
 import { NextRequest } from "next/server";
 
 import { requireAdmin } from "@/lib/api-auth";
+import type { DbInput } from "@/lib/db-types";
 import { recordAudit, redactForAudit } from "@/lib/audit";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import {
@@ -49,7 +50,8 @@ export async function GET(
   const target = await resolveTarget(params);
   if (target.error) return target.error;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const select = getResourceSelect(target.resource);
   const query = target.model.findById(target.id);
@@ -76,7 +78,8 @@ export async function PATCH(
   const target = await resolveTarget(params);
   if (target.error) return target.error;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const payload = await request.json().catch(() => null);
   if (!payload || typeof payload !== "object") {
@@ -84,7 +87,7 @@ export async function PATCH(
   }
 
   const schema = getResourceSchema(target.resource);
-  let data: Record<string, any> = payload;
+  let data: DbInput = payload;
 
   if (schema) {
     const parsed = schema.safeParse(payload);
@@ -95,7 +98,7 @@ export async function PATCH(
     // then passed the *raw* `payload` to findByIdAndUpdate and discarded
     // `parsed.data` entirely. Validation was decorative — any extra field in the
     // body was written straight to the document.
-    data = parsed.data as Record<string, any>;
+    data = parsed.data as DbInput;
   }
 
   const updated = await target.model.findByIdAndUpdate(
@@ -137,7 +140,8 @@ export async function DELETE(
   const target = await resolveTarget(params);
   if (target.error) return target.error;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   // An admin deleting their own account would leave them signed in with a session
   // for a user that no longer exists.

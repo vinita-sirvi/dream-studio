@@ -1,8 +1,4 @@
-import {
-  connectToDatabase,
-  isDatabaseConfigured,
-  tryConnectToDatabase,
-} from "./mongodb";
+import { isDatabaseConfigured, tryConnectToDatabase } from "./mongodb";
 import { hashPassword } from "./password";
 import {
   Category,

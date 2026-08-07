@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
+import type { DbDoc, DbInput } from "@/lib/db-types";
 
 import { escapeEmailHtml, sendEmailQuietly } from "@/lib/email";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, successResponse } from "@/lib/http";
 import { CustomOrder } from "@/lib/models";
 import { customOrderSchema } from "@/lib/validators";
@@ -34,7 +35,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const session = await getCurrentSession();
 
@@ -43,7 +45,7 @@ export async function POST(request: NextRequest) {
     userId: session?.user.id,
     orderId: generateReference("CO"),
     stage: "submitted",
-  } as any);
+  } as DbInput);
 
   const adminTargets = getAdminEmails();
   const to =
@@ -74,16 +76,16 @@ export async function POST(request: NextRequest) {
   // Confirmation to the customer, so a brief does not feel like it vanished.
   await sendEmailQuietly({
     to: parsed.data.email,
-    subject: `We have your brief — ${(order as any).orderId}`,
+    subject: `We have your brief — ${(order as DbDoc).orderId}`,
     text:
       `Thank you, ${parsed.data.name}.\n\n` +
-      `Your commission brief ${(order as any).orderId} is with us. ` +
+      `Your commission brief ${(order as DbDoc).orderId} is with us. ` +
       `A tailor will review it and come back with a quotation.`,
     html:
       `<p>Thank you, ${escapeEmailHtml(parsed.data.name)}.</p>` +
-      `<p>Your commission brief <strong>${(order as any).orderId}</strong> is with us. ` +
+      `<p>Your commission brief <strong>${(order as DbDoc).orderId}</strong> is with us. ` +
       `A tailor will review it and come back with a quotation before any work begins.</p>`,
   });
 
-  return successResponse({ orderId: (order as any).orderId }, 201);
+  return successResponse({ orderId: (order as DbDoc).orderId }, 201);
 }

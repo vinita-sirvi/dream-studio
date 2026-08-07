@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
+import type { DbDoc } from "@/lib/db-types";
 
 import { errorResponse, successResponse } from "@/lib/http";
 import { Order } from "@/lib/models";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { trackOrderSchema } from "@/lib/validators";
 
@@ -36,9 +37,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
-  const order: any = await Order.findOne({
+  const order: DbDoc = await Order.findOne({
     orderId: parsed.data.orderId.trim().toUpperCase(),
     email: parsed.data.email.trim().toLowerCase(),
   })
@@ -61,11 +63,11 @@ export async function POST(request: NextRequest) {
     updatedAt: order.updatedAt,
     shippingMethod: order.shippingMethod ?? null,
     grandTotal: order.totals?.grandTotal ?? 0,
-    items: (order.items ?? []).map((item: any) => ({
+    items: (order.items ?? []).map((item: DbDoc) => ({
       name: item.name,
       quantity: item.quantity,
     })),
-    timeline: (order.timeline ?? []).map((entry: any) => ({
+    timeline: (order.timeline ?? []).map((entry: DbDoc) => ({
       status: entry.status,
       note: entry.note ?? null,
       at: entry.at ?? null,

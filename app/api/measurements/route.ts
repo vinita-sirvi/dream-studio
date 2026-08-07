@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
+import type { DbInput } from "@/lib/db-types";
 
 import { requireSession } from "@/lib/api-auth";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Measurement } from "@/lib/models";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { measurementSchema } from "@/lib/validators";
 
@@ -24,7 +25,8 @@ export async function GET() {
   const auth = await requireSession();
   if (!auth.ok) return auth.response;
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const profiles = await Measurement.find({ userId: auth.session.user.id })
     .sort({ createdAt: -1 })
@@ -51,7 +53,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const count = await Measurement.countDocuments({ userId: auth.session.user.id });
   if (count >= MAX_PROFILES) {
@@ -61,12 +64,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const { userId: _ignored, ...data } = parsed.data;
+  // Any `userId` in the body is dropped and the session's used instead. Deleting
+  // the key rather than setting it to undefined matters: an undefined value
+  // surviving into a $set would unset the owner and orphan the row.
+  const data: DbInput = { ...parsed.data };
+  delete data.userId;
 
   const created = await Measurement.create({
     ...data,
     userId: auth.session.user.id,
-  } as any);
+  } as DbInput);
 
   return successResponse(serialize(created), 201);
 }

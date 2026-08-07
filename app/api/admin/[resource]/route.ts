@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 
 import { requireAdmin } from "@/lib/api-auth";
+import type { DbInput } from "@/lib/db-types";
 import { recordAudit, redactForAudit } from "@/lib/audit";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import {
@@ -59,7 +60,8 @@ export async function GET(
     return errorResponse("Unknown resource.", 404);
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const { limit, skip, page } = readPagination(request);
   const select = getResourceSelect(resource);
@@ -113,7 +115,8 @@ export async function POST(
     if (limited) return limited;
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const payload = await request.json().catch(() => null);
   if (!payload || typeof payload !== "object") {
@@ -129,9 +132,7 @@ export async function POST(
     return errorResponse("Validation failed.", 400, data.error.flatten());
   }
 
-  const created = await model.create(
-    (data ? data.data : payload) as Record<string, any>,
-  );
+  const created = await model.create((data ? data.data : payload) as DbInput);
 
   if (session) {
     await recordAudit({

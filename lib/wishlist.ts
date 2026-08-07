@@ -1,4 +1,5 @@
 import "server-only";
+import type { DbDoc } from "./db-types";
 
 import type { OwnerScope } from "./api-auth";
 import { Product, Wishlist } from "./models";
@@ -33,7 +34,7 @@ function scopeFilter(scope: OwnerScope) {
 /** The ids on the wishlist, cheap enough to call for a heart's initial state. */
 export async function readWishlistIds(scope: OwnerScope): Promise<string[]> {
   await connectToDatabase();
-  const doc: any = await Wishlist.findOne(scopeFilter(scope)).lean();
+  const doc: DbDoc = await Wishlist.findOne(scopeFilter(scope)).lean();
   return (doc?.productIds ?? []).map(String);
 }
 
@@ -49,16 +50,16 @@ export async function readWishlist(scope: OwnerScope): Promise<WishlistItem[]> {
   }).lean();
 
   // Preserve the order things were saved in rather than Mongo's natural order.
-  const byId = new Map(products.map((product: any) => [String(product._id), product]));
+  const byId = new Map(products.map((product: DbDoc) => [String(product._id), product]));
 
   return ids
     .map((id) => byId.get(id))
     .filter(Boolean)
-    .map((product: any) => {
+    .map((product: DbDoc) => {
       const price = round2(
         product.pricing?.specialPrice ?? product.pricing?.sellingPrice ?? 0,
       );
-      const images: any[] = product.images ?? [];
+      const images: DbDoc[] = product.images ?? [];
       const image =
         images.find((entry) => entry?.isPrimary && entry?.url)?.url ??
         images.find((entry) => entry?.url)?.url ??

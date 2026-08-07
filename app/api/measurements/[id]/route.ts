@@ -2,9 +2,10 @@ import { isValidObjectId } from "mongoose";
 import { NextRequest } from "next/server";
 
 import { requireSession } from "@/lib/api-auth";
+import type { DbInput } from "@/lib/db-types";
 import { errorResponse, serialize, successResponse } from "@/lib/http";
 import { Measurement } from "@/lib/models";
-import { connectToDatabase } from "@/lib/mongodb";
+import { ensureDatabase } from "@/lib/mongodb";
 import { enforceRateLimit } from "@/lib/rate-limit";
 import { measurementSchema } from "@/lib/validators";
 
@@ -37,9 +38,14 @@ export async function PATCH(
     );
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
-  const { userId: _ignored, ...data } = parsed.data;
+  // Any `userId` in the body is dropped and the session's used instead. Deleting
+  // the key rather than setting it to undefined matters: an undefined value
+  // surviving into a $set would unset the owner and orphan the row.
+  const data: DbInput = { ...parsed.data };
+  delete data.userId;
 
   const updated = await Measurement.findOneAndUpdate(
     { _id: id, userId: auth.session.user.id },
@@ -69,7 +75,8 @@ export async function DELETE(
     return errorResponse("Invalid identifier.", 400);
   }
 
-  await connectToDatabase();
+  const offline = await ensureDatabase();
+  if (offline) return offline;
 
   const deleted = await Measurement.findOneAndDelete({
     _id: id,
