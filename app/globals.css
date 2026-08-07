@@ -2,45 +2,46 @@
 
 /* ==========================================================================
    Divya & Design — design tokens
-   Direction: "Refined warm atelier". Warm bone canvas, deep cocoa ink,
-   antique brass accent.
+   Direction: "Modern teal & coral". Cool near-white canvas, deep teal-black
+   ink, a warm coral accent carried through both light and dark sections.
 
-   Contrast note: every text token below is AA-verified against --color-canvas
-   (#FBF7F2). `brass` measures 3.5:1 so it is valid for LARGE text, borders and
-   icons only; use `brass-ink` (6.0:1) for any small accent text.
+   Contrast note: every text token below is WCAG-verified against
+   --color-canvas (#F7F9F9). `brass` measures 3.5:1 so it is valid for LARGE
+   text, borders and icons only; use `brass-ink` (5.7:1) for any small accent
+   text. Full ratios recorded next to each token below.
    ========================================================================== */
 
 @theme {
   /* -- Surfaces ---------------------------------------------------------- */
-  --color-canvas: #fbf7f2; /* page background        */
-  --color-canvas-warm: #f6efe5; /* alternating sections   */
+  --color-canvas: #f7f9f9; /* page background        */
+  --color-canvas-warm: #eef3f2; /* alternating sections   */
   --color-surface: #ffffff; /* cards                  */
-  --color-surface-sunk: #f3ece2; /* insets, wells          */
+  --color-surface-sunk: #e7eeed; /* insets, wells          */
 
   /* -- Text -------------------------------------------------------------- */
-  --color-ink: #241a12; /* 15.1:1  headings, body */
-  --color-ink-soft: #6b5b4e; /*  6.0:1  secondary text */
-  --color-ink-faint: #8a7a6c; /*  4.0:1  LARGE text only */
+  --color-ink: #0f1e1e; /* 16.2:1  headings, body */
+  --color-ink-soft: #4a5d5d; /*  6.6:1  secondary text */
+  --color-ink-faint: #728484; /*  3.7:1  LARGE text only */
 
-  /* -- Accent ------------------------------------------------------------ */
-  --color-brass: #a67c4e; /*  3.5:1  large text / borders / icons */
-  --color-brass-ink: #7a5730; /*  6.0:1  small accent text */
-  --color-brass-soft: #d9c3a3; /* decorative fills */
-  --color-brass-wash: #f0e4d3; /* tinted backgrounds */
+  /* -- Accent (coral) ------------------------------------------------------ */
+  --color-brass: #ea4f2e; /*  3.5:1  large text / borders / icons */
+  --color-brass-ink: #b23a17; /*  5.7:1  small accent text */
+  --color-brass-soft: #ffb199; /* decorative fills / links on dark */
+  --color-brass-wash: #fff1ec; /* tinted backgrounds */
 
   /* -- Inverted ---------------------------------------------------------- */
-  --color-espresso: #2a1b10; /* dark sections */
-  --color-espresso-soft: #3f2c1d;
-  --color-on-dark: #f5eee4;
-  --color-on-dark-soft: #c9b7a3; /* 6.2:1 on espresso */
+  --color-espresso: #0b1717; /* dark sections */
+  --color-espresso-soft: #142424;
+  --color-on-dark: #f5f9f8;
+  --color-on-dark-soft: #a9bdbb; /* 9.3:1 on espresso */
 
   /* -- Lines ------------------------------------------------------------- */
-  --color-line: #e6d9c8;
-  --color-line-strong: #d3c0a8;
+  --color-line: #dce4e3;
+  --color-line-strong: #c3cfce;
 
   /* -- Status ------------------------------------------------------------ */
-  --color-success: #4a6b45;
-  --color-danger: #96392f;
+  --color-success: #1e7a5c;
+  --color-danger: #c0392b;
 
   /* -- Type -------------------------------------------------------------- */
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
@@ -56,12 +57,14 @@
   --radius-panel: 2rem;
 
   /* -- Shadows ----------------------------------------------------------- */
-  --shadow-soft: 0 1px 2px rgba(36, 26, 18, 0.04),
-    0 8px 24px -12px rgba(36, 26, 18, 0.1);
-  --shadow-lift: 0 2px 4px rgba(36, 26, 18, 0.04),
-    0 18px 40px -16px rgba(36, 26, 18, 0.16);
-  --shadow-float: 0 4px 8px rgba(36, 26, 18, 0.05),
-    0 32px 64px -24px rgba(36, 26, 18, 0.22);
+  /* rgb(15,30,30) = --color-ink, so shadows read as a neutral teal-tinted
+     shade rather than the muddy brown left over from the old palette. */
+  --shadow-soft: 0 1px 2px rgba(15, 30, 30, 0.04),
+    0 8px 24px -12px rgba(15, 30, 30, 0.1);
+  --shadow-lift: 0 2px 4px rgba(15, 30, 30, 0.04),
+    0 18px 40px -16px rgba(15, 30, 30, 0.16);
+  --shadow-float: 0 4px 8px rgba(15, 30, 30, 0.05),
+    0 32px 64px -24px rgba(15, 30, 30, 0.22);
 }
 
 /* ==========================================================================

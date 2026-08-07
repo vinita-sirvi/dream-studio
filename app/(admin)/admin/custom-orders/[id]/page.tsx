@@ -53,28 +53,28 @@ export default async function AdminCustomOrderDetailsPage({
 
   return (
     <main className="grid gap-6">
-      <section className="rounded-[2rem] border border-[#eadccc] bg-white/85 p-8 shadow-[0_18px_42px_rgba(103,73,47,0.08)]">
+      <section className="rounded-[2rem] border border-[#dce4e3] bg-white/85 p-8 shadow-[0_18px_42px_rgba(15,30,30,0.08)]">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8a6b56]">Admin / Custom Orders</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#b23a17]">Admin / Custom Orders</p>
             <h1
-              className="mt-3 text-4xl font-medium text-[#2f2319]"
+              className="mt-3 text-4xl font-medium text-[#0f1e1e]"
               style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
             >
               {order.orderId}
             </h1>
           </div>
-          <Link href="/admin/custom-orders" className="rounded-md border border-[#d8c5b0] bg-white px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#3b2417]">
+          <Link href="/admin/custom-orders" className="rounded-md border border-[#c3cfce] bg-white px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-[#0b1717]">
             Back to list
           </Link>
         </div>
       </section>
 
-      <section className="grid gap-4 rounded-[1.8rem] border border-[#eadccc] bg-white/85 p-6 shadow-[0_16px_34px_rgba(103,73,47,0.08)] md:grid-cols-2">
+      <section className="grid gap-4 rounded-[1.8rem] border border-[#dce4e3] bg-white/85 p-6 shadow-[0_16px_34px_rgba(15,30,30,0.08)] md:grid-cols-2">
         {fields.map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-[#eadccc] bg-[#fbf6ef] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8a6b56]">{label}</p>
-            <p className="mt-2 text-sm leading-7 text-[#2f2319]">{value || "N/A"}</p>
+          <div key={label} className="rounded-2xl border border-[#dce4e3] bg-[#eef3f2] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#b23a17]">{label}</p>
+            <p className="mt-2 text-sm leading-7 text-[#0f1e1e]">{value || "N/A"}</p>
           </div>
         ))}
       </section>

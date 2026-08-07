@@ -122,10 +122,10 @@ export default function FabricScene() {
       uniforms: {
         uTime: { value: 0 },
         uPointer: { value: new Vector2(0, 0) },
-        // Brand palette: espresso → brass → warm bone.
-        uColorDeep: { value: new Color("#2a1b10") },
-        uColorMid: { value: new Color("#a67c4e") },
-        uColorLight: { value: new Color("#f6efe5") },
+        // Brand palette: espresso → coral → near-white teal.
+        uColorDeep: { value: new Color("#0b1717") },
+        uColorMid: { value: new Color("#ea4f2e") },
+        uColorLight: { value: new Color("#f5f9f8") },
       },
     });
 

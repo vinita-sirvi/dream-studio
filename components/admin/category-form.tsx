@@ -81,7 +81,7 @@ export function CategoryForm({
   }
 
   const inputClass =
-    "rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none";
+    "rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none";
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
@@ -109,15 +109,15 @@ export function CategoryForm({
       </div>
       <div className="grid gap-4 md:grid-cols-2">
         <input className={inputClass} type="number" min={0} placeholder="Sort order" value={form.sortOrder} onChange={(e) => updateField("sortOrder", e.target.value)} />
-        <div className="flex flex-wrap gap-6 rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm text-[#49382d]">
+        <div className="flex flex-wrap gap-6 rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm text-[#0f1e1e]">
           <label className="flex items-center gap-2"><input type="checkbox" checked={form.featured} onChange={(e) => updateField("featured", e.target.checked)} /> Featured</label>
           <label className="flex items-center gap-2"><input type="checkbox" checked={form.hidden} onChange={(e) => updateField("hidden", e.target.checked)} /> Hidden</label>
         </div>
       </div>
-      <button type="submit" disabled={status === "loading"} className="w-fit rounded-md bg-[#3b2417] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#533521] disabled:cursor-not-allowed disabled:opacity-70">
+      <button type="submit" disabled={status === "loading"} className="w-fit rounded-md bg-[#0b1717] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#142424] disabled:cursor-not-allowed disabled:opacity-70">
         {mode === "create" ? "Create Category" : "Update Category"}
       </button>
-      {message ? <p className="text-sm text-[#8a6b56]">{message}</p> : null}
+      {message ? <p className="text-sm text-[#b23a17]">{message}</p> : null}
     </form>
   );
 }

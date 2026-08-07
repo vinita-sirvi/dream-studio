@@ -36,7 +36,7 @@ export function AdminDeleteButton({
       type="button"
       onClick={onDelete}
       disabled={loading}
-      className="rounded-md border border-[#e4c7b2] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f] transition hover:bg-[#faf5ee] disabled:cursor-not-allowed disabled:opacity-70"
+      className="rounded-md border border-[#ffb199] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17] transition hover:bg-[#eef3f2] disabled:cursor-not-allowed disabled:opacity-70"
     >
       {loading ? "Deleting" : label}
     </button>

@@ -85,7 +85,7 @@ function ImageEditor({
       {value.map((item, index) => (
         <div
           key={`${item.url || "image"}-${index}`}
-          className="grid gap-4 rounded-2xl border border-[#eadccc] bg-[#fcf8f2] p-4"
+          className="grid gap-4 rounded-2xl border border-[#dce4e3] bg-[#eef3f2] p-4"
         >
           <CloudinaryUploadField
             label={`Product media ${index + 1}`}
@@ -108,7 +108,7 @@ function ImageEditor({
                 onChange(next);
               }}
               placeholder="Alt text"
-              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+              className="rounded-xl border border-[#c3cfce] bg-white px-4 py-3 text-sm outline-none"
             />
             <select
               value={item.type}
@@ -117,7 +117,7 @@ function ImageEditor({
                 next[index] = { ...next[index], type: event.target.value as ImageItem["type"] };
                 onChange(next);
               }}
-              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+              className="rounded-xl border border-[#c3cfce] bg-white px-4 py-3 text-sm outline-none"
             >
               <option value="image">Image</option>
               <option value="video">Video</option>
@@ -132,9 +132,9 @@ function ImageEditor({
               type="number"
               min={0}
               placeholder="Order"
-              className="rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm outline-none"
+              className="rounded-xl border border-[#c3cfce] bg-white px-4 py-3 text-sm outline-none"
             />
-            <label className="flex items-center gap-2 rounded-xl border border-[#d8c5b0] bg-white px-4 py-3 text-sm text-[#49382d]">
+            <label className="flex items-center gap-2 rounded-xl border border-[#c3cfce] bg-white px-4 py-3 text-sm text-[#0f1e1e]">
               <input
                 type="checkbox"
                 checked={item.isPrimary}
@@ -151,7 +151,7 @@ function ImageEditor({
             <button
               type="button"
               onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
-              className="rounded-md border border-[#d8c5b0] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+              className="rounded-md border border-[#c3cfce] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
             >
               Remove
             </button>
@@ -161,7 +161,7 @@ function ImageEditor({
       <button
         type="button"
         onClick={() => onChange([...value, createEmptyImage()])}
-        className="w-fit rounded-md border border-dashed border-[#cdb69d] bg-[#fffaf5] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+        className="w-fit rounded-md border border-dashed border-[#c3cfce] bg-[#fff1ec] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
       >
         Add Image
       </button>
@@ -190,12 +190,12 @@ function ListEditor({
               onChange(next);
             }}
             placeholder={placeholder}
-            className="min-w-0 flex-1 rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
+            className="min-w-0 flex-1 rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none"
           />
           <button
             type="button"
             onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
-            className="rounded-md border border-[#d8c5b0] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+            className="rounded-md border border-[#c3cfce] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
           >
             Remove
           </button>
@@ -204,7 +204,7 @@ function ListEditor({
       <button
         type="button"
         onClick={() => onChange([...value, ""])}
-        className="w-fit rounded-md border border-dashed border-[#cdb69d] bg-[#fffaf5] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+        className="w-fit rounded-md border border-dashed border-[#c3cfce] bg-[#fff1ec] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
       >
         Add Item
       </button>
@@ -231,7 +231,7 @@ function SpecEditor({
               onChange(next);
             }}
             placeholder="Label"
-            className="rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
+            className="rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none"
           />
           <input
             value={item.value}
@@ -241,12 +241,12 @@ function SpecEditor({
               onChange(next);
             }}
             placeholder="Value"
-            className="rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none"
+            className="rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none"
           />
           <button
             type="button"
             onClick={() => onChange(value.filter((_, rowIndex) => rowIndex !== index))}
-            className="rounded-md border border-[#d8c5b0] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+            className="rounded-md border border-[#c3cfce] bg-white px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
           >
             Remove
           </button>
@@ -255,7 +255,7 @@ function SpecEditor({
       <button
         type="button"
         onClick={() => onChange([...value, createEmptySpec()])}
-        className="w-fit rounded-md border border-dashed border-[#cdb69d] bg-[#fffaf5] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]"
+        className="w-fit rounded-md border border-dashed border-[#c3cfce] bg-[#fff1ec] px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]"
       >
         Add Measurement / Spec
       </button>
@@ -428,14 +428,14 @@ export function ProductForm({
   }
 
   const inputClass =
-    "rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none";
+    "rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none";
 
   return (
     <form onSubmit={onSubmit} className="grid gap-6">
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Core details</h2>
-          <p className="mt-1 text-sm text-[#6f5d50]">Mobile-friendly, compact inputs for quick admin edits.</p>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Core details</h2>
+          <p className="mt-1 text-sm text-[#4a5d5d]">Mobile-friendly, compact inputs for quick admin edits.</p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
           <input className={inputClass} placeholder="Product name" value={form.name} onChange={(e) => updateField("name", e.target.value)} required />
@@ -467,9 +467,9 @@ export function ProductForm({
         </div>
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Pricing and stock</h2>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Pricing and stock</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           <input className={inputClass} type="number" min={0} placeholder="MRP" value={form.mrp} onChange={(e) => updateField("mrp", e.target.value)} />
@@ -489,9 +489,9 @@ export function ProductForm({
         </div>
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Descriptions</h2>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Descriptions</h2>
         </div>
         <textarea className={inputClass} placeholder="Description" rows={6} value={form.description} onChange={(e) => updateField("description", e.target.value)} required />
         <textarea className={inputClass} placeholder="Short description" rows={3} value={form.shortDescription} onChange={(e) => updateField("shortDescription", e.target.value)} />
@@ -499,10 +499,10 @@ export function ProductForm({
         <input className={inputClass} placeholder="Care instructions" value={form.careInstructions} onChange={(e) => updateField("careInstructions", e.target.value)} />
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Highlights</h2>
-          <p className="mt-1 text-sm text-[#6f5d50]">Use short selling points for mobile shoppers.</p>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Highlights</h2>
+          <p className="mt-1 text-sm text-[#4a5d5d]">Use short selling points for mobile shoppers.</p>
         </div>
         <ListEditor
           value={form.highlights}
@@ -511,10 +511,10 @@ export function ProductForm({
         />
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Images</h2>
-          <p className="mt-1 text-sm text-[#6f5d50]">Add multiple assets and mark the hero image as primary.</p>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Images</h2>
+          <p className="mt-1 text-sm text-[#4a5d5d]">Add multiple assets and mark the hero image as primary.</p>
         </div>
         <ImageEditor
           value={form.images}
@@ -522,10 +522,10 @@ export function ProductForm({
         />
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Measurements and specifications</h2>
-          <p className="mt-1 text-sm text-[#6f5d50]">Structured fields for size notes, fit points, and product details.</p>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Measurements and specifications</h2>
+          <p className="mt-1 text-sm text-[#4a5d5d]">Structured fields for size notes, fit points, and product details.</p>
         </div>
         <SpecEditor
           value={form.specifications}
@@ -533,15 +533,15 @@ export function ProductForm({
         />
       </section>
 
-      <section className="grid gap-4 rounded-[1.5rem] border border-[#eadccc] bg-[#fffaf5] p-4 md:p-5">
+      <section className="grid gap-4 rounded-[1.5rem] border border-[#dce4e3] bg-[#fff1ec] p-4 md:p-5">
         <div>
-          <h2 className="text-lg font-semibold text-[#2f2319]">Customization</h2>
+          <h2 className="text-lg font-semibold text-[#0f1e1e]">Customization</h2>
         </div>
-        <label className="flex items-center gap-3 text-sm text-[#49382d]">
+        <label className="flex items-center gap-3 text-sm text-[#0f1e1e]">
           <input type="checkbox" checked={form.customizationEnabled} onChange={(e) => updateField("customizationEnabled", e.target.checked)} />
           Customization enabled
         </label>
-        <label className="flex items-center gap-3 text-sm text-[#49382d]">
+        <label className="flex items-center gap-3 text-sm text-[#0f1e1e]">
           <input type="checkbox" checked={form.measurementsEnabled} onChange={(e) => updateField("measurementsEnabled", e.target.checked)} />
           Measurements enabled
         </label>
@@ -551,11 +551,11 @@ export function ProductForm({
         <button
           type="submit"
           disabled={status === "loading"}
-          className="w-full rounded-md bg-[#3b2417] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#533521] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+          className="w-full rounded-md bg-[#0b1717] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#142424] disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
         >
           {status === "loading" ? "Saving" : mode === "create" ? "Create Product" : "Update Product"}
         </button>
-        {message ? <p className="text-sm text-[#8a6b56]">{message}</p> : null}
+        {message ? <p className="text-sm text-[#b23a17]">{message}</p> : null}
       </div>
     </form>
   );

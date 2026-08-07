@@ -78,7 +78,7 @@ export function CollectionForm({
   }
 
   const inputClass =
-    "rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none";
+    "rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none";
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
@@ -104,14 +104,14 @@ export function CollectionForm({
         </select>
         <input className={inputClass} placeholder="Product IDs comma separated" value={form.productIds} onChange={(e) => updateField("productIds", e.target.value)} />
       </div>
-      <label className="flex items-center gap-3 text-sm text-[#49382d]">
+      <label className="flex items-center gap-3 text-sm text-[#0f1e1e]">
         <input type="checkbox" checked={form.featured} onChange={(e) => updateField("featured", e.target.checked)} />
         Featured collection
       </label>
-      <button type="submit" disabled={statusState === "loading"} className="w-fit rounded-md bg-[#3b2417] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#533521] disabled:cursor-not-allowed disabled:opacity-70">
+      <button type="submit" disabled={statusState === "loading"} className="w-fit rounded-md bg-[#0b1717] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#142424] disabled:cursor-not-allowed disabled:opacity-70">
         {mode === "create" ? "Create Collection" : "Update Collection"}
       </button>
-      {message ? <p className="text-sm text-[#8a6b56]">{message}</p> : null}
+      {message ? <p className="text-sm text-[#b23a17]">{message}</p> : null}
     </form>
   );
 }

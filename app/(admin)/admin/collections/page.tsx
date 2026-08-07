@@ -14,23 +14,23 @@ export default async function AdminCollectionsPage() {
 
   return (
     <main className="grid gap-6">
-      <section className="rounded-[2rem] border border-[#eadccc] bg-white/85 p-8 shadow-[0_18px_42px_rgba(103,73,47,0.08)]">
+      <section className="rounded-[2rem] border border-[#dce4e3] bg-white/85 p-8 shadow-[0_18px_42px_rgba(15,30,30,0.08)]">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8a6b56]">Admin / Collections</p>
-            <h1 className="mt-3 text-4xl font-medium text-[#2f2319]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#b23a17]">Admin / Collections</p>
+            <h1 className="mt-3 text-4xl font-medium text-[#0f1e1e]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
               Collection management
             </h1>
           </div>
-          <Link href="/admin/collections/new" className="rounded-md bg-[#3b2417] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
+          <Link href="/admin/collections/new" className="rounded-md bg-[#0b1717] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             New Collection
           </Link>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[1.8rem] border border-[#eadccc] bg-white/85 shadow-[0_16px_34px_rgba(103,73,47,0.08)]">
+      <section className="overflow-hidden rounded-[1.8rem] border border-[#dce4e3] bg-white/85 shadow-[0_16px_34px_rgba(15,30,30,0.08)]">
         <table className="w-full text-left text-sm">
-          <thead className="bg-[#fbf6ef] text-xs uppercase tracking-[0.18em] text-[#8a6b56]">
+          <thead className="bg-[#eef3f2] text-xs uppercase tracking-[0.18em] text-[#b23a17]">
             <tr>
               <th className="px-4 py-4">Collection</th>
               <th className="px-4 py-4">Status</th>
@@ -39,14 +39,14 @@ export default async function AdminCollectionsPage() {
           </thead>
           <tbody>
             {collections.map((collection: any) => (
-              <tr key={String(collection._id)} className="border-t border-[#f0e3d6]">
+              <tr key={String(collection._id)} className="border-t border-[#dce4e3]">
                 <td className="px-4 py-4">
-                  <div className="font-medium text-[#2f2319]">{collection.name}</div>
-                  <div className="text-xs text-[#6f5d50]">{collection.slug}</div>
+                  <div className="font-medium text-[#0f1e1e]">{collection.name}</div>
+                  <div className="text-xs text-[#4a5d5d]">{collection.slug}</div>
                 </td>
                 <td className="px-4 py-4">{collection.status}</td>
                 <td className="px-4 py-4 flex gap-2">
-                  <Link href={`/admin/collections/${String(collection._id)}`} className="rounded-md border border-[#d8c5b0] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#3b2417]">
+                  <Link href={`/admin/collections/${String(collection._id)}`} className="rounded-md border border-[#c3cfce] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#0b1717]">
                     Edit
                   </Link>
                   <AdminDeleteButton resource="collections" id={String(collection._id)} />

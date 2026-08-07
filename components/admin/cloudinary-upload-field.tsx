@@ -78,15 +78,15 @@ export function CloudinaryUploadField({
   }
 
   const baseShell =
-    "rounded-2xl border border-dashed bg-[#fcf8f2] transition " +
-    (dragActive ? "border-[#7a4f2f] bg-[#fff7ef]" : "border-[#d8c5b0]");
+    "rounded-2xl border border-dashed bg-[#eef3f2] transition " +
+    (dragActive ? "border-[#b23a17] bg-[#fff1ec]" : "border-[#c3cfce]");
 
   return (
     <div className="grid gap-3">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#4a3123]">{label}</p>
-          <p className="mt-1 text-xs text-[#7f6858]">{helperText}</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#0f1e1e]">{label}</p>
+          <p className="mt-1 text-xs text-[#4a5d5d]">{helperText}</p>
         </div>
         <div className="flex items-center gap-2">
           {value && allowClear ? (
@@ -97,7 +97,7 @@ export function CloudinaryUploadField({
                 setMessage("");
                 setUploadedKind(null);
               }}
-              className="rounded-full border border-[#d8c5b0] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#7a4f2f]"
+              className="rounded-full border border-[#c3cfce] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#b23a17]"
             >
               Clear
             </button>
@@ -105,7 +105,7 @@ export function CloudinaryUploadField({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="rounded-full bg-[#3b2417] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white"
+            className="rounded-full bg-[#0b1717] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white"
           >
             Browse
           </button>
@@ -143,7 +143,7 @@ export function CloudinaryUploadField({
       >
         {value ? (
           <div className={`grid gap-4 ${compact ? "md:grid-cols-[140px_1fr]" : "md:grid-cols-[180px_1fr]"}`}>
-            <div className="overflow-hidden rounded-2xl border border-[#eadccc] bg-white shadow-[0_10px_24px_rgba(103,73,47,0.08)]">
+            <div className="overflow-hidden rounded-2xl border border-[#dce4e3] bg-white shadow-[0_10px_24px_rgba(15,30,30,0.08)]">
               {assetKind === "video" ? (
                 <video src={value} controls className="h-full min-h-[150px] w-full object-cover" />
               ) : (
@@ -152,18 +152,18 @@ export function CloudinaryUploadField({
             </div>
             <div className="flex min-w-0 flex-col justify-between gap-3">
               <div>
-                <p className="text-sm font-medium text-[#2f2319]">File uploaded to Cloudinary</p>
-                <p className="mt-2 break-all text-xs leading-6 text-[#6f5d50]">{value}</p>
+                <p className="text-sm font-medium text-[#0f1e1e]">File uploaded to Cloudinary</p>
+                <p className="mt-2 break-all text-xs leading-6 text-[#4a5d5d]">{value}</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => inputRef.current?.click()}
-                  className="rounded-full border border-[#d8c5b0] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#7a4f2f]"
+                  className="rounded-full border border-[#c3cfce] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#b23a17]"
                 >
                   Replace
                 </button>
-                <span className="rounded-full bg-[#efe2d2] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#7a4f2f]">
+                <span className="rounded-full bg-[#fff1ec] px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#b23a17]">
                   {assetKind ?? "image"}
                 </span>
               </div>
@@ -172,15 +172,15 @@ export function CloudinaryUploadField({
         ) : (
           <div className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
             <div className="flex items-center gap-4">
-              <div className="grid h-16 w-16 place-items-center rounded-2xl border border-[#eadccc] bg-white text-[#8a6b56]">
+              <div className="grid h-16 w-16 place-items-center rounded-2xl border border-[#dce4e3] bg-white text-[#b23a17]">
                 +
               </div>
               <div>
-                <p className="text-sm font-medium text-[#2f2319]">Drop your file here</p>
-                <p className="mt-1 text-xs text-[#6f5d50]">Cloudinary will store the asset and return a secure URL automatically.</p>
+                <p className="text-sm font-medium text-[#0f1e1e]">Drop your file here</p>
+                <p className="mt-1 text-xs text-[#4a5d5d]">Cloudinary will store the asset and return a secure URL automatically.</p>
               </div>
             </div>
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#7a4f2f]">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-[#b23a17]">
               {uploading ? "Uploading..." : "Ready"}
             </div>
           </div>
@@ -198,8 +198,8 @@ export function CloudinaryUploadField({
         />
       </div>
 
-      {message ? <p className="text-sm text-[#b45309]">{message}</p> : null}
-      {uploading ? <p className="text-sm text-[#7a4f2f]">Uploading to Cloudinary...</p> : null}
+      {message ? <p className="text-sm text-[#b23a17]">{message}</p> : null}
+      {uploading ? <p className="text-sm text-[#b23a17]">Uploading to Cloudinary...</p> : null}
     </div>
   );
 }

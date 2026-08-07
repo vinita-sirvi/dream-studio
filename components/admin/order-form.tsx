@@ -85,7 +85,7 @@ export function OrderForm({
   }
 
   const inputClass =
-    "rounded-xl border border-[#d8c5b0] bg-[#fcf8f2] px-4 py-3 text-sm outline-none";
+    "rounded-xl border border-[#c3cfce] bg-[#eef3f2] px-4 py-3 text-sm outline-none";
 
   return (
     <form onSubmit={onSubmit} className="grid gap-4">
@@ -114,10 +114,10 @@ export function OrderForm({
       </div>
       <textarea className={inputClass} placeholder="Notes" rows={4} value={form.notes} onChange={(e) => updateField("notes", e.target.value)} />
       <textarea className={inputClass} placeholder="Items JSON" rows={6} value={form.itemsJson} onChange={(e) => updateField("itemsJson", e.target.value)} />
-      <button type="submit" disabled={statusState === "loading"} className="w-fit rounded-md bg-[#3b2417] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#533521] disabled:cursor-not-allowed disabled:opacity-70">
+      <button type="submit" disabled={statusState === "loading"} className="w-fit rounded-md bg-[#0b1717] px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#142424] disabled:cursor-not-allowed disabled:opacity-70">
         {mode === "create" ? "Create Order" : "Update Order"}
       </button>
-      {message ? <p className="text-sm text-[#8a6b56]">{message}</p> : null}
+      {message ? <p className="text-sm text-[#b23a17]">{message}</p> : null}
     </form>
   );
 }

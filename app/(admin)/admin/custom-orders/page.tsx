@@ -23,23 +23,23 @@ export default async function AdminCustomOrdersPage() {
 
   return (
     <main className="grid gap-6">
-      <section className="rounded-[2rem] border border-[#eadccc] bg-white/85 p-8 shadow-[0_18px_42px_rgba(103,73,47,0.08)]">
+      <section className="rounded-[2rem] border border-[#dce4e3] bg-white/85 p-8 shadow-[0_18px_42px_rgba(15,30,30,0.08)]">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#8a6b56]">Admin / Custom Orders</p>
-            <h1 className="mt-3 text-4xl font-medium text-[#2f2319]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[#b23a17]">Admin / Custom Orders</p>
+            <h1 className="mt-3 text-4xl font-medium text-[#0f1e1e]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
               Custom order requests
             </h1>
           </div>
-          <Link href="/custom-order" className="rounded-md bg-[#3b2417] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
+          <Link href="/custom-order" className="rounded-md bg-[#0b1717] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white">
             Public Form
           </Link>
         </div>
       </section>
 
-      <section className="overflow-hidden rounded-[1.8rem] border border-[#eadccc] bg-white/85 shadow-[0_16px_34px_rgba(103,73,47,0.08)]">
+      <section className="overflow-hidden rounded-[1.8rem] border border-[#dce4e3] bg-white/85 shadow-[0_16px_34px_rgba(15,30,30,0.08)]">
         <table className="w-full text-left text-sm">
-          <thead className="bg-[#fbf6ef] text-xs uppercase tracking-[0.18em] text-[#8a6b56]">
+          <thead className="bg-[#eef3f2] text-xs uppercase tracking-[0.18em] text-[#b23a17]">
             <tr>
               <th className="px-4 py-4">Request</th>
               <th className="px-4 py-4">Customer</th>
@@ -50,20 +50,20 @@ export default async function AdminCustomOrdersPage() {
           <tbody>
             {customOrders.length ? (
               customOrders.map((order) => (
-                <tr key={String(order._id)} className="border-t border-[#f0e3d6]">
+                <tr key={String(order._id)} className="border-t border-[#dce4e3]">
                   <td className="px-4 py-4">
-                    <div className="font-medium text-[#2f2319]">{order.orderId}</div>
-                    <div className="text-xs text-[#6f5d50]">{order.productType}</div>
+                    <div className="font-medium text-[#0f1e1e]">{order.orderId}</div>
+                    <div className="text-xs text-[#4a5d5d]">{order.productType}</div>
                   </td>
                   <td className="px-4 py-4">
-                    <div className="font-medium text-[#2f2319]">{order.name}</div>
-                    <div className="text-xs text-[#6f5d50]">{order.email}</div>
+                    <div className="font-medium text-[#0f1e1e]">{order.name}</div>
+                    <div className="text-xs text-[#4a5d5d]">{order.email}</div>
                   </td>
                   <td className="px-4 py-4">{order.stage}</td>
                   <td className="px-4 py-4 flex gap-2">
                     <Link
                       href={`/admin/custom-orders/${String(order._id)}`}
-                      className="rounded-md border border-[#d8c5b0] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#3b2417]"
+                      className="rounded-md border border-[#c3cfce] bg-white px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#0b1717]"
                     >
                       View
                     </Link>
@@ -72,8 +72,8 @@ export default async function AdminCustomOrdersPage() {
                 </tr>
               ))
             ) : (
-              <tr className="border-t border-[#f0e3d6]">
-                <td className="px-4 py-8 text-[#6f5d50]" colSpan={4}>
+              <tr className="border-t border-[#dce4e3]">
+                <td className="px-4 py-8 text-[#4a5d5d]" colSpan={4}>
                   No custom orders found yet.
                 </td>
               </tr>
