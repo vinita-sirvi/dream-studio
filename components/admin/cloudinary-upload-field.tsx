@@ -4,6 +4,18 @@
 
 import { useRef, useState } from "react";
 
+const MAX_UPLOAD_SIZE = 20 * 1024 * 1024;
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+]);
+
 function inferAssetKind(value: string) {
   if (/\/video\//i.test(value) || /\.(mp4|mov|webm|m4v)(\?|$)/i.test(value)) {
     return "video";
@@ -43,11 +55,31 @@ export function CloudinaryUploadField({
     setMessage("");
 
     try {
-      const payload = new FormData();
-      payload.append("file", file);
-      payload.append("folder", folder);
+      if (file.size > MAX_UPLOAD_SIZE) {
+        setMessage("File is too large. Please upload a file smaller than 20 MB.");
+        return;
+      }
 
-      const response = await fetch("/api/uploads/cloudinary", {
+      if (!ALLOWED_MIME_TYPES.has(file.type)) {
+        setMessage("Only JPEG, PNG, WebP, AVIF, GIF images and MP4, WebM or MOV video can be uploaded.");
+        return;
+      }
+
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+      if (!cloudName || !uploadPreset) {
+        setMessage("Cloudinary upload is not configured.");
+        return;
+      }
+
+      const payload = new FormData();
+      payload.append("upload_preset", uploadPreset);
+      if (folder) {
+        payload.append("folder", folder);
+      }
+      payload.append("file", file);
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`, {
         method: "POST",
         body: payload,
       });
@@ -59,8 +91,8 @@ export function CloudinaryUploadField({
       }
 
       const uploaded = data?.data ?? data;
-      onChange(uploaded?.secureUrl ?? "");
-      setUploadedKind(uploaded?.resourceType ?? inferAssetKind(file.name));
+      onChange(uploaded?.secure_url ?? uploaded?.secureUrl ?? "");
+      setUploadedKind(uploaded?.resource_type ?? uploaded?.resourceType ?? inferAssetKind(file.name));
     } catch {
       setMessage("Upload failed. Please try again.");
     } finally {
